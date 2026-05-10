@@ -1,0 +1,174 @@
+---
+// Notifications.astro - Component for Firebase Messaging
+---
+
+<div id="notif-container" class="hidden">
+  <div class="notif-banner">
+    <p>🔔 Recibe alertas críticas de seguridad y transporte en tiempo real.</p>
+    <button id="btn-subscribe">Activar Alertas</button>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden">
+  <div class="toast-content">
+    <span class="toast-icon">⚠️</span>
+    <div class="toast-text">
+      <strong id="toast-title">Alerta</strong>
+      <p id="toast-body"></p>
+    </div>
+  </div>
+  <button id="toast-close">×</button>
+</div>
+
+<style>
+  #notif-container {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--text-primary);
+  }
+  .hidden { display: none !important; }
+  .notif-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  button {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  button:hover {
+    opacity: 0.9;
+  }
+
+  /* Toast Styles */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 1000;
+    box-shadow: 0 10px 15px -3px var(--card-shadow);
+    border: 1px solid var(--border);
+    width: auto;
+    max-width: 90vw;
+    animation: slideUp 0.3s ease-out;
+  }
+  @keyframes slideUp {
+    from { bottom: -50px; opacity: 0; }
+    to { bottom: 20px; opacity: 1; }
+  }
+  .toast-content { display: flex; align-items: center; gap: 12px; }
+  .toast-icon { font-size: 1.5rem; }
+  .toast-text strong { display: block; font-size: 0.9rem; color: var(--accent); }
+  .toast-text p { margin: 0; font-size: 0.85rem; }
+  #toast-close { 
+    background: transparent; 
+    border: none; 
+    color: var(--text-secondary); 
+    font-size: 1.2rem; 
+    cursor: pointer;
+    padding: 0 5px;
+  }
+  #toast-close:hover { color: var(--text-primary); }
+</style>
+
+<script>
+  import { initializeApp } from "firebase/app";
+  import { getMessaging, getToken, onMessage } from "firebase/messaging";
+  import { firebaseConfig, VAPID_KEY } from "../services/firebase-config";
+
+  const showToast = (title, body) => {
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastBody = document.getElementById('toast-body');
+    const toastClose = document.getElementById('toast-close');
+
+    if (!toast || !toastTitle || !toastBody) return;
+
+    toastTitle.textContent = title;
+    toastBody.textContent = body;
+    toast.classList.remove('hidden');
+
+    toastClose.onclick = () => toast.classList.add('hidden');
+    
+    // Auto hide after 10s
+    setTimeout(() => toast.classList.add('hidden'), 10000);
+  };
+
+  const initNotifications = async () => {
+    // Si no se han puesto las credenciales reales todavía, no intentamos nada
+    if (firebaseConfig.apiKey === "PLACEHOLDER") return;
+
+    const container = document.getElementById('notif-container');
+    const btn = document.getElementById('btn-subscribe');
+
+    // Solo mostramos el banner si no tenemos permiso
+    if (Notification.permission === 'default') {
+      container?.classList.remove('hidden');
+    } else if (Notification.permission === 'granted') {
+      // Si ya tenemos permiso, obtenemos el token automáticamente para que lo veas en consola
+      try {
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+        const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+        if (currentToken) {
+          console.log('🚀 Tu Token FCM actual es:', currentToken);
+        }
+      } catch (err) {
+        console.error('Error al recuperar token existente:', err);
+      }
+    }
+
+    btn?.addEventListener('click', async () => {
+      try {
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          const currentToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+          if (currentToken) {
+            console.log('Token FCM:', currentToken);
+            container?.classList.add('hidden');
+            showToast('¡Éxito!', 'Alertas activadas correctamente.');
+          }
+        }
+      } catch (error) {
+        console.error('Error al suscribir:', error);
+      }
+    });
+
+    // Escuchar mensajes en primer plano (con la app abierta)
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+    onMessage(messaging, (payload) => {
+      console.log('Mensaje recibido en primer plano:', payload);
+      showToast(payload.notification?.title || 'Alerta', payload.notification?.body || '');
+    });
+  };
+
+  // Asegurar ejecución en el cliente
+  document.addEventListener('astro:page-load', initNotifications);
+  if (document.readyState === 'complete') {
+    initNotifications();
+  } else {
+    window.addEventListener('load', initNotifications);
+  }
+</script>

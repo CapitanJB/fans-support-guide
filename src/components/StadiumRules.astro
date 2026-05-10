@@ -1,0 +1,191 @@
+---
+/**
+ * StadiumRules.astro - Pocket guide for stadium security
+ */
+const prohibited = [
+  { item: "Botellas de vidrio y latas", icon: "🚫" },
+  { item: "Bolsos grandes (> 30x15x30 cm)", icon: "🚫" },
+  { item: "Cámaras profesionales", icon: "📷" },
+  { item: "Paraguas rígidos", icon: "☂️" },
+  { item: "Punteros láser", icon: "✨" },
+  { item: "Baterías externas grandes", icon: "🔋" }
+];
+
+const permitted = [
+  { item: "Botellas de plástico (sin tapón)", icon: "✅" },
+  { item: "Pequeño bolso personal (11x16.5 cm)", icon: "👛" },
+  { item: "Batería externa pequeña", icon: "📱" },
+  { item: "Capa de lluvia", icon: "🧥" }
+];
+
+const flagRules = [
+  { item: "Tamaño máximo 2m x 1.5m", icon: "🏳️" },
+  { item: "Materiales no inflamables", icon: "🔥" },
+  { item: "Mástiles: plástico flexible (máx. 1m x 1cm)", icon: "📏" },
+  { item: "Contenido positivo y respetuoso", icon: "🤝" },
+  { item: "Sin fines comerciales o promocionales", icon: "🚫" },
+  { item: "Libre de mensajes ofensivos o discriminatorios", icon: "🛑" }
+];
+
+const bagRules = [
+  { item: "Bolsas de plástico transparente (máx. 30x15x30 cm)", icon: "🛍️" },
+  { item: "Bolsos de mano pequeños (máx. 11x16.5 cm)", icon: "👛" },
+  { item: "Se permite una bolsa por persona", icon: "👤" }
+];
+---
+
+<section class="rules-container">
+  <button id="rules-toggle" class="rules-header">
+    <h3>📖 Guía de Bolsillo: Reglas del Estadio</h3>
+    <span id="toggle-icon">▼</span>
+  </button>
+  
+  <div id="rules-content" class="rules-content hidden">
+    <div class="rules-grid">
+      <div class="rules-column prohibited">
+        <h4>Prohibido</h4>
+        <ul>
+          {prohibited.map(p => (
+            <li><span class="icon">{p.icon}</span> {p.item}</li>
+          ))}
+        </ul>
+      </div>
+      <div class="rules-column permitted">
+        <h4>Permitido</h4>
+        <ul>
+          {permitted.map(p => (
+            <li><span class="icon">{p.icon}</span> {p.item}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="rules-details">
+      <div class="detail-section">
+        <h5>🏳️ Normativa de Banderas</h5>
+        <ul>
+          {flagRules.map(r => (
+            <li><span class="icon">{r.icon}</span> {r.item}</li>
+          ))}
+        </ul>
+      </div>
+      <div class="detail-section">
+        <h5>👜 Normativa de Bolsas</h5>
+        <ul>
+          {bagRules.map(r => (
+            <li><span class="icon">{r.icon}</span> {r.item}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <p class="disclaimer">* Todas las banderas y bolsas serán inspeccionadas en los accesos. Sujeto a cambios según la FIFA y la sede local.</p>
+  </div>
+</section>
+
+<style>
+  .rules-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px var(--card-shadow);
+  }
+
+  .rules-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--bg-primary);
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: inherit;
+    text-align: left;
+  }
+
+  .rules-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .rules-content {
+    padding: 1.5rem;
+  }
+
+  .hidden { display: none; }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .rules-column h4, .detail-section h5 {
+    margin-top: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .prohibited h4 { color: var(--accent); border-color: var(--accent); }
+  .permitted h4 { color: #2e7d32; border-color: #2e7d32; }
+
+  .rules-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+  }
+
+  .detail-section h5 {
+    color: var(--text-primary);
+    border-bottom-style: dotted;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-primary);
+  }
+
+  .icon { font-size: 1rem; }
+
+  .disclaimer {
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+  }
+</style>
+
+<script>
+  const toggleBtn = document.getElementById('rules-toggle');
+  const content = document.getElementById('rules-content');
+  const icon = document.getElementById('toggle-icon');
+
+  toggleBtn?.addEventListener('click', () => {
+    const isHidden = content?.classList.toggle('hidden');
+    if (icon) {
+      icon.textContent = isHidden ? '▼' : '▲';
+    }
+  });
+</script>

@@ -1,0 +1,212 @@
+---
+// Map.astro - Component for Leaflet.js
+---
+
+<div class="map-controls">
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" data-category="Todos">Todos</button>
+    <button class="filter-btn" data-category="Estadio">🏟️ Estadios</button>
+    <button class="filter-btn" data-category="Transporte">🚌 Transporte</button>
+    <button class="filter-btn" data-category="Parking">🅿️ Parking</button>
+    <button class="filter-btn" data-category="FanZone">🎉 FanZones</button>
+    <button class="filter-btn" data-category="Seguridad">🛡️ Seguridad</button>
+    <button class="filter-btn" data-category="Salud">🏥 Salud</button>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<style>
+  .map-controls {
+    margin-bottom: 10px;
+  }
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: none; /* Firefox */
+  }
+  .filter-bar::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+  .filter-btn {
+    white-space: nowrap;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .filter-btn.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-color: var(--text-primary);
+  }
+  #map {
+    height: 60vh;
+    width: 100%;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px var(--card-shadow);
+    transition: filter 0.3s;
+  }
+
+  /* Dark mode map filter */
+  [data-theme='dark'] #map {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+  }
+  [data-theme='power-save'] #map {
+    filter: invert(100%) hue-rotate(180deg) brightness(80%) contrast(100%) grayscale(100%);
+  }
+</style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<script>
+  import L from 'leaflet';
+  import { fetchPOIs, type PointOfInterest } from '../services/data-fetch';
+
+  const categoryColors: Record<string, string> = {
+    'Estadio': '#1a237e',
+    'Salud': '#d32f2f',
+    'Seguridad': '#fbc02d',
+    'Transporte': '#2e7d32',
+    'FanZone': '#7b1fa2',
+    'Parking': '#01579b',
+  };
+
+  const getIcon = (categoria: string) => {
+    const color = categoryColors[categoria] || '#555';
+    return L.divIcon({
+      html: `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-12-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>`,
+      className: 'custom-marker',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    });
+  };
+
+  let map: L.Map;
+  let markerGroup: L.FeatureGroup;
+  let allPois: PointOfInterest[] = [];
+  let currentCity: string = '';
+  let currentCategory: string = 'Todos';
+
+  const initMap = async () => {
+    const defaultCenter: [number, number] = [19.3029, -99.1505];
+    
+    if (map) return;
+
+    map = L.map('map').setView(defaultCenter, 13);
+    markerGroup = L.featureGroup().addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    allPois = await fetchPOIs();
+    updateMarkers();
+
+    // Setup filter listeners
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        currentCategory = target.dataset.category || 'Todos';
+        
+        buttons.forEach(b => b.classList.remove('active'));
+        target.classList.add('active');
+        
+        updateMarkers();
+      });
+    });
+  };
+
+  const updateMarkers = () => {
+    if (!markerGroup) return;
+    markerGroup.clearLayers();
+
+    let filtered = allPois;
+    console.log(`Updating markers. Total POIs: ${allPois.length}, Current City: ${currentCity}, Current Category: ${currentCategory}`);
+
+    // Filter by City if context exists, but KEEP 'Seguridad' category globally
+    if (currentCity) {
+      filtered = filtered.filter(p => p.ciudad === currentCity || p.categoria === 'Seguridad');
+    }
+
+    // Filter by Category
+    if (currentCategory !== 'Todos') {
+      filtered = filtered.filter(p => p.categoria === currentCategory);
+    }
+
+    console.log(`Filtered POIs to display: ${filtered.length}`);
+
+    if (filtered.length > 0) {
+      filtered.forEach(poi => {
+        const marker = L.marker([poi.latitud, poi.longitud], { icon: getIcon(poi.categoria) })
+          .bindPopup(`
+            <div style="font-family: sans-serif;">
+              <h3 style="margin: 0 0 5px 0;">${poi.nombre}</h3>
+              <p style="margin: 0 0 5px 0;"><b>${poi.categoria}</b></p>
+              <p style="margin: 0;">${poi.descripcion}</p>
+              <small>${poi.direccion}</small>
+            </div>
+          `);
+        markerGroup.addLayer(marker);
+      });
+
+      // If user is specifically looking for Security or no city is selected, 
+      // fit bounds so they see all markers (like Miami)
+      if (currentCategory === 'Seguridad' || !currentCity) {
+        map.fitBounds(markerGroup.getBounds(), { padding: [50, 50] });
+      }
+    }
+  };
+
+  // Listen for match selection
+  window.addEventListener('match:selected', (e: any) => {
+    const match = e.detail.match;
+    if (!match) return;
+
+    currentCity = match.ciudad;
+    
+    // Update markers based on new city
+    updateMarkers();
+
+    // Fly to stadium
+    if (match.stadium && map) {
+      map.flyTo([match.stadium.latitud, match.stadium.longitud], 15, {
+        duration: 1.5
+      });
+      
+      // Open stadium popup after flight
+      setTimeout(() => {
+        L.popup()
+          .setLatLng([match.stadium.latitud, match.stadium.longitud])
+          .setContent(`<b>Sede: ${match.stadium.nombre}</b><br>${match.homeTeam} vs ${match.awayTeam}`)
+          .openOn(map);
+      }, 1600);
+    }
+  });
+
+  // Listen for manual center events (from Search or Logistics)
+  window.addEventListener('map:center', (e: any) => {
+    if (!map) return;
+    const { lat, lon, name } = e.detail;
+    
+    map.setView([lat, lon], 16);
+    
+    L.popup()
+      .setLatLng([lat, lon])
+      .setContent(`<b>${name}</b>`)
+      .openOn(map);
+  });
+
+  document.addEventListener('astro:page-load', initMap);
+  if (document.readyState === 'complete') initMap();
+  else window.addEventListener('load', initMap);
+</script>

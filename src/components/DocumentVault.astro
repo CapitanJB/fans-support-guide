@@ -1,0 +1,158 @@
+---
+// DocumentVault.astro - Component for offline survival documents
+---
+
+<div id="vault-container">
+  <h2>📁 Carpeta Digital</h2>
+  <p class="description">Guarda copias de tu pasaporte y documentos críticos. Se almacenan solo en este dispositivo.</p>
+
+  <div class="upload-area">
+    <label for="file-upload" class="custom-file-upload">
+      ➕ Añadir Documento
+    </label>
+    <input id="file-upload" type="file" accept="image/*,application/pdf" />
+  </div>
+
+  <ul id="document-list">
+    <!-- Los documentos aparecerán aquí -->
+  </ul>
+</div>
+
+<style>
+  #vault-container {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px var(--card-shadow);
+    margin-top: 2rem;
+    border: 1px solid var(--border);
+  }
+  h2 { margin-top: 0; color: var(--text-primary); font-size: 1.25rem; }
+  .description { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+  
+  .upload-area { margin-bottom: 1.5rem; }
+  
+  .custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    cursor: pointer;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border-radius: 6px;
+    font-weight: bold;
+    transition: opacity 0.2s;
+  }
+  .custom-file-upload:hover { opacity: 0.9; }
+  #file-upload { display: none; }
+
+  #document-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Los items de la lista se inyectarán vía JS */
+</style>
+
+<script>
+  import { saveDocument, getAllDocuments, deleteDocument, type OfflineDocument } from '../services/db';
+
+  const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+  const docList = document.getElementById('document-list');
+
+  const renderDocuments = async () => {
+    if (!docList) return;
+    
+    const docs = await getAllDocuments();
+    
+    if (docs.length === 0) {
+      docList.innerHTML = '<li class="empty-msg">No hay documentos guardados aún.</li>';
+      return;
+    }
+
+    docList.innerHTML = docs.map(doc => `
+      <li class="doc-item" data-id="${doc.id}">
+        <div class="doc-info">
+          <span class="doc-name">${doc.name}</span>
+          <span class="doc-date">${new Date(doc.date).toLocaleDateString()}</span>
+        </div>
+        <div class="doc-actions">
+          <button class="btn-view" data-id="${doc.id}">👁️ Ver</button>
+          <button class="btn-delete" data-id="${doc.id}">🗑️</button>
+        </div>
+      </li>
+    `).join('');
+
+    // Attach events to dynamic buttons
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id;
+        if (id && confirm('¿Eliminar este documento?')) {
+          await deleteDocument(id);
+          renderDocuments();
+        }
+      });
+    });
+
+    document.querySelectorAll('.btn-view').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id;
+        if (id) {
+          const allDocs = await getAllDocuments();
+          const doc = allDocs.find(d => d.id === id);
+          if (doc) {
+            const url = URL.createObjectURL(doc.data);
+            window.open(url, '_blank');
+          }
+        }
+      });
+    });
+  };
+
+  fileInput?.addEventListener('change', async (e) => {
+    const file = fileInput.files?.[0];
+    if (file) {
+      const newDoc: OfflineDocument = {
+        id: crypto.randomUUID(),
+        name: file.name,
+        type: file.type,
+        data: file,
+        date: Date.now()
+      };
+
+      await saveDocument(newDoc);
+      fileInput.value = ''; // Reset
+      renderDocuments();
+    }
+  });
+
+  // Estilos dinámicos para los items
+  const style = document.createElement('style');
+  style.textContent = `
+    .doc-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .doc-info { display: flex; flex-direction: column; }
+    .doc-name { font-weight: bold; color: var(--text-primary); font-size: 0.95rem; }
+    .doc-date { font-size: 0.75rem; color: var(--text-secondary); }
+    .doc-actions { display: flex; gap: 8px; }
+    .btn-view { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+    .btn-delete { background: var(--bg-secondary); border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    .empty-msg { text-align: center; color: var(--text-secondary); padding: 20px; font-style: italic; }
+  `;
+  document.head.appendChild(style);
+
+  // Init
+  renderDocuments();
+</script>

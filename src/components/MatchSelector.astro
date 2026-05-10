@@ -1,0 +1,145 @@
+---
+/**
+ * MatchSelector.astro - Selection of the active match context
+ */
+---
+
+<section class="match-selector-container">
+  <label for="match-select">Sede y Partido:</label>
+  <div class="select-wrapper">
+    <select id="match-select" class="match-select">
+      <option value="" disabled selected>Cargando partidos...</option>
+    </select>
+    <span class="select-arrow">▼</span>
+  </div>
+</section>
+
+<style>
+  .match-selector-container {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--text-primary);
+    box-shadow: 4px 4px 0 var(--text-primary);
+  }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .match-select {
+    width: 100%;
+    appearance: none;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .match-select:focus {
+    border-color: var(--accent);
+  }
+
+  .select-arrow {
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+</style>
+
+<script>
+  import { getSurvivalData, type Match } from '../services/match-service';
+
+  const select = document.getElementById('match-select') as HTMLSelectElement;
+  const STORAGE_KEY = 'selected_match_id';
+
+  async function initSelector() {
+    try {
+      const { matches } = await getSurvivalData();
+      
+      if (matches.length === 0) {
+        select.innerHTML = '<option value="">No hay partidos disponibles</option>';
+        return;
+      }
+
+      // Fill options
+      select.innerHTML = matches.map(m => {
+        // Parse date for better display
+        const dateParts = m.date.split('/');
+        const dateFormatted = dateParts.length === 3 ? `${dateParts[0]}/${dateParts[1]}` : m.date;
+        
+        return `<option value="${m.id}">${dateFormatted} - ${m.homeTeam} vs ${m.awayTeam} - ${m.ciudad || m.stadium?.ciudad || 'Sede'}</option>`;
+      }).join('');
+
+      // Determine initial selection
+      let selectedId = localStorage.getItem(STORAGE_KEY);
+      
+      if (!selectedId || !matches.find(m => m.id === selectedId)) {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Comparar solo la fecha
+
+        // Buscar el primer partido futuro o de hoy
+        const nextMatch = matches.find(m => {
+          const parts = m.date.split('/');
+          // Asumimos formato DD/MM/YYYY
+          if (parts.length === 3) {
+            const matchDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+            return matchDate >= now;
+          }
+          return true; // Fallback si el formato no es el esperado
+        });
+
+        // Si hay uno futuro, lo usamos. Si no, cogemos el último de la lista (más reciente en el pasado).
+        selectedId = nextMatch ? nextMatch.id : matches[matches.length - 1].id;
+      }
+
+      select.value = selectedId;
+      
+      // Dispatch initial state
+      dispatchMatchChange(selectedId, matches.find(m => m.id === selectedId)!);
+
+      // Listen for changes
+      select.addEventListener('change', () => {
+        const newMatch = matches.find(m => m.id === select.value);
+        if (newMatch) {
+          localStorage.setItem(STORAGE_KEY, newMatch.id);
+          dispatchMatchChange(newMatch.id, newMatch);
+        }
+      });
+
+    } catch (error) {
+      console.error('Error initializing match selector:', error);
+    }
+  }
+
+  function dispatchMatchChange(id: string, match: Match) {
+    console.log('Dispatching match:selected', id);
+    window.dispatchEvent(new CustomEvent('match:selected', {
+      detail: { id, match }
+    }));
+  }
+
+  // Ensure client-side execution
+  document.addEventListener('astro:page-load', initSelector);
+  if (document.readyState === 'complete') initSelector();
+  else window.addEventListener('load', initSelector);
+</script>
