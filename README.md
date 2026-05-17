@@ -75,6 +75,26 @@ The application uses a centralized dictionary system for easy localization. All 
 3. Add a new translation block inside the `ui` object by copying the `en` block and translating the values.
 4. (Optional) Set `defaultLang = 'fr'` to use it as the primary language.
 
+#### 📍 Points of Interest (POI) Categories
+The app categorizes locations on the map and in search results. The default categories are:
+- **Estadio** (Stadiums)
+- **Salud** (Health / Hospitals)
+- **Seguridad** (Security / Police)
+- **Transporte** (Transport / Metro / Bus)
+- **FanZone** (Fan Zones)
+- **Parking** (Parking)
+
+**To add a new POI category (e.g., 'Food'):**
+1. **Google Sheets**: Start using the new category name (e.g., `Food`) in your POIs spreadsheet.
+2. **Translations**: Add the new category to `src/i18n/ui.ts` (e.g., `'categories.food': '🍔 Food'`).
+3. **Map Filters**: In `src/components/Map.astro`:
+   - Add a new filter button: `<button class="filter-btn" data-category="Food">{t('categories.food')}</button>`
+   - Map the translation in the `categoryTranslations` object within the `<script>` tag.
+   - Assign a color in the `categoryColors` object.
+4. **Search Emojis**: In `src/components/VenueSearch.astro`:
+   - Map the translation in the `categoryTranslations` object.
+   - Update `getEmojiForCategory` to return an emoji for the new category (e.g., `if (cat.includes('food')) return '🍔';`).
+
 ### 🖼️ Required Assets
 To ensure the PWA and branding work correctly, you must provide the following files in the `public/` directory:
 
