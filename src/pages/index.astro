@@ -1,4 +1,4 @@
-﻿---
+---
 import Map from '../components/Map.astro';
 import Notifications from '../components/Notifications.astro';
 import WeatherWidget from '../components/WeatherWidget.astro';
@@ -15,11 +15,11 @@ import ContactModal from '../components/ContactModal.astro';
 <html lang="es">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/png" href="/favicon.png" />
+		<link rel="icon" type="image/svg+xml" href="/logos/logo.svg" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content="GuÃ­a para aficionados al fÃºtbol. Mapas offline, logÃ­stica y alertas de seguridad para el Mundial 2026." />
+		<meta name="description" content="Guía para aficionados al fútbol. Mapas offline, logística y alertas de seguridad para el Mundial 2026." />
 		<link rel="manifest" href="/manifest.webmanifest" />
 		
 		<!-- Theme Management Script (Prevent FOUC) -->
@@ -37,7 +37,7 @@ import ContactModal from '../components/ContactModal.astro';
 		</script>
 
 		<script is:inline src="/registerSW.js"></script>
-		<title>GuÃ­a para Aficionados - World Cup 2026</title>
+		<title>Guía para Aficionados - World Cup 2026</title>
 		<style is:global>
 			*, *::before, *::after {
 				box-sizing: border-box;
@@ -229,19 +229,19 @@ import ContactModal from '../components/ContactModal.astro';
 		<main>
 			<header>
 				<div class="header-logo-container" style="gap: 8px;">
-					<img src="/logos/logo.png" alt="Project Logo" class="header-logo" />
+					<img src="/logos/logo.svg" alt="Project Logo" class="header-logo" />
 					<!-- <img src="/logos/logo.png" alt="Logo" class="header-logo" /> -->
 				</div>
-				<h1>GuÃ­a para Aficionados - WC26</h1>
+				<h1>Guía para Aficionados - WC26</h1>
 				<div style="display: flex; gap: 0.5rem;">
 					<AboutModal />
 					<ContactModal />
-					<button id="theme-btn" class="theme-toggle" title="Cambiar Tema">ðŸŒ™</button>
+					<button id="theme-btn" class="theme-toggle" title="Cambiar Tema">🌙</button>
 				</div>
 			</header>
 
 			<div id="status-badge" class="status">Cargando...</div>
-			<span id="battery-status" class="power-save-badge">ðŸ”‹ Ahorro Activo</span>
+			<span id="battery-status" class="power-save-badge">🔋 Ahorro Activo</span>
 			
 			<MatchSelector />
 			
@@ -289,7 +289,7 @@ import ContactModal from '../components/ContactModal.astro';
 				document.documentElement.setAttribute('data-theme', newTheme);
 				localStorage.setItem('theme', newTheme);
 				currentTheme = newTheme;
-				themeBtn.textContent = newTheme === 'light' ? 'ðŸŒ™' : (newTheme === 'dark' ? 'ðŸ”‹' : 'â˜€ï¸');
+				themeBtn.textContent = newTheme === 'light' ? '🌙' : (newTheme === 'dark' ? '🔋' : '☀️');
 				
 				if (newTheme === 'power-save') {
 					batteryBadge.style.display = 'inline-block';

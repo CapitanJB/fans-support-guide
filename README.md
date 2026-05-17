@@ -23,35 +23,52 @@ Built with a **€0 budget stack**, this project serves as a template for organi
 ## 📦 Getting Started
 
 ### 1. Prerequisites
-- Node.js (v18+)
+- Node.js (v22+)
 - A Google Account (for Google Sheets)
 - A Firebase Project (for notifications)
 
 ### 2. Installation
-`ash
+```bash
 git clone <your-repo-url>
 cd fans-support-guide
 npm install
-`
+```
 
 ### 3. Configuration
+
+#### Environment Variables
+1. Copy the template: `cp .env.example .env`
+2. Fill in your own values for Firebase and Google Sheets.
 
 #### Google Sheets (CMS)
 1. Create a Google Sheet with three tabs: `POIs`, `Matches`, and `Timeline`.
 2. Follow the column structure found in `src/services/match-service.ts`.
 3. Publish to the Web as **CSV**.
-4. Copy the CSV URLs and paste them into `src/services/match-service.ts`.
+4. Copy the CSV URLs and paste them into your `.env` file.
 
 #### Firebase
 1. Create a project in the [Firebase Console](https://console.firebase.google.com/).
-2. Add a Web App and copy the `firebaseConfig` object.
-3. Paste the config into `src/services/firebase-config.ts`.
+2. Add a Web App and copy the configuration.
+3. Add the values to your `.env` file.
 4. Enable Cloud Messaging and generate a Web Push (VAPID) key.
 
+### 🖼️ Required Assets
+To ensure the PWA and branding work correctly, you must provide the following files in the `public/` directory:
+
+| File | Description | Recommended Size |
+| :--- | :--- | :--- |
+| `logos/logo.svg` | Primary logo used in header | SVG or 200x200px |
+| `favicon.png` | Browser tab icon | 32x32px |
+| `apple-touch-icon.png` | iOS home screen icon | 180x180px |
+| `pwa-500x500.png` | Manifest icon (General/Maskable) | 500x500px |
+| `screenshot-mobile.png` | App store/Install preview | ~1080x1920px |
+
+*Note: A placeholder `logo.svg` is provided by default.*
+
 ### 4. Development
-`ash
+```bash
 npm run dev
-`
+```
 
 ### 5. Deployment
 Push your code to GitHub and connect it to **Netlify**. Ensure you configure the build command as `npm run build` and the publish directory as `dist`.

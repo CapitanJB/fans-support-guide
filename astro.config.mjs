@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://guiawc26-fes.netlify.app',
+  site: 'https://your-domain.netlify.app',
   integrations: [
     sitemap(),
     AstroPWA({

@@ -1,46 +1,44 @@
-﻿---
+---
 // AboutModal.astro
 ---
 
-<button id="about-open-btn" class="about-btn" title="Sobre nosotros e informaciÃ³n de la App">
+<button id="about-open-btn" class="about-btn" title="Sobre nosotros e información de la App">
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
 </button>
 
 <dialog id="about-dialog" class="about-modal">
   <div class="modal-content">
     <header class="modal-header">
-      <h2>InformaciÃ³n Ãštil</h2>
+      <h2>Información Útil</h2>
       <button id="about-close-btn" class="close-btn">&times;</button>
     </header>
     
     <div class="modal-body">
       <section class="info-section">
-        <h3>ðŸ›¡ï¸ About Fans Support Guide</h3>
-        <p>Si estÃ¡s usando esta aplicaciÃ³n, es que este verano estarÃ¡s en territorio americano animando a la SelecciÃ³n EspaÃ±ola Masculina de FÃºtbol en su camino hacia la que esperamos sea su segunda estrella de CampeÃ³n Mundial.</p>
-        <p>Nosotros tenemos tantas ganas como tÃº de estar mostrando nuestra pasiÃ³n en las gradas de los estadios estadounidenses y mexicanos, y para ello hemos recopilado en este documento una serie de datos y consejos que esperamos te sean Ãºtiles para organizar tu viaje y estancia de la mejor forma, para que puedas centrarte en disfrutar animar a nuestro equipo.</p>
+        <h3>🛡️ Sobre Fans Support Guide</h3>
+        <p>Esta aplicación es una herramienta diseñada para ayudar a los aficionados a navegar y disfrutar de grandes eventos deportivos de manera segura y organizada.</p>
+        <p>Hemos recopilado una serie de datos, mapas y consejos que te serán útiles para gestionar tu logística, encontrar puntos de interés y mantenerte informado sobre avisos de seguridad en tiempo real.</p>
         
-        <h4>Â¿QuÃ© es una Fansâ€™ Embassy?</h4>
-        <p>Una Embajada de Aficionados es un servicio de asesoramiento, informaciÃ³n y apoyo para los aficionados al fÃºtbol que viajan a un partido fuera de casa o a un torneo internacional en un paÃ­s extranjero. La prestaciÃ³n de un servicio de embajada de aficionados forma una parte constructiva y positiva del programa de hospitalidad en un torneo internacional.</p>
-        <p>Las caracterÃ­sticas esenciales de un servicio de Embajada de Fans son el suministro de informaciÃ³n precisa, fiable, actualizada, independiente y objetiva sobre cualquier asunto de interÃ©s para los aficionados que viajan.</p>
-        <p>Las Fansâ€™ Embassies son un proyecto de <a href="https://www.fanseurope.org/" target="_blank">Football Supporters Europe (FSE)</a>. La rama espaÃ±ola es operada por voluntarios de <a href="http://fasfe.org/" target="_blank">FASFE - Accionistas y Socios del fÃºtbol EspaÃ±ol</a>.</p>
+        <h4>¿Qué es una Embajada de Aficionados?</h4>
+        <p>Es un servicio de asesoramiento, información y apoyo para los aficionados que viajan para asistir a partidos o torneos internacionales. Su objetivo es proporcionar información precisa, fiable y actualizada para mejorar la experiencia del viaje y la estancia en el extranjero.</p>
         
-        <h4>Â¿QuÃ© pretende ser esta guÃ­a?</h4>
-        <p>Queremos poner en manos de los aficionados espaÃ±oles, de forma accesible y concentrada, toda la informaciÃ³n necesaria para que su experiencia como hinchas durante el torneo sea lo mÃ¡s sencilla y cÃ³moda posible.</p>
+        <h4>¿Qué pretende ser esta guía?</h4>
+        <p>Queremos poner en manos de los usuarios, de forma accesible y concentrada, la información necesaria para que su experiencia durante el evento sea lo más sencilla y cómoda posible, especialmente en situaciones de alta congestión de red donde el acceso a internet es limitado.</p>
         
-        <h4>Â¿QuÃ© NO es esta guÃ­a?</h4>
-        <p>Esta guÃ­a no pretende sustituir la informaciÃ³n oficial de la organizaciÃ³n o las autoridades. Tampoco es una guÃ­a turÃ­stica al uso; centramos nuestras recomendaciones en la experiencia del dÃ­a de partido.</p>
+        <h4>¿Qué NO es esta guía?</h4>
+        <p>Esta guía no sustituye la información oficial de los organizadores del evento o las autoridades locales. Es un recurso complementario centrado en la experiencia del aficionado y la logística del día de partido.</p>
       </section>
 
       <hr />
 
       <section class="info-section">
-        <h3>ðŸ“± Sobre esta AplicaciÃ³n</h3>
-        <p>Esta herramienta ha sido diseÃ±ada especÃ­ficamente para las condiciones extremas de un gran torneo de fÃºtbol:</p>
+        <h3>📱 Sobre esta Aplicación</h3>
+        <p>Esta herramienta ha sido diseñada específicamente para las condiciones extremas de un gran torneo de fútbol:</p>
         <ul>
-          <li><strong>Funciona sin Internet:</strong> Una vez abierta, la App guarda los mapas, contactos y logÃ­stica en tu mÃ³vil. PodrÃ¡s consultarlos dentro del estadio aunque no haya cobertura.</li>
-          <li><strong>Privacidad de Documentos:</strong> Tus documentos personales (pasaportes, seguros) **nunca** se suben a la nube ni a ningÃºn servidor. La App solo crea un enlace privado en la memoria de tu telÃ©fono para que los tengas a mano.</li>
-          <li><strong>SincronizaciÃ³n AutomÃ¡tica:</strong> En cuanto tu mÃ³vil recupere la conexiÃ³n, la guÃ­a se actualizarÃ¡ sola con las Ãºltimas alertas y avisos de seguridad.</li>
-          <li><strong>Bajo Consumo:</strong> Optimizada para no agotar tu baterÃ­a durante los desplazamientos largos a las sedes.</li>
+          <li><strong>Funciona sin Internet:</strong> Una vez abierta, la App guarda los mapas, contactos y logística en tu móvil. Podrás consultarlos dentro del estadio aunque no haya cobertura.</li>
+          <li><strong>Privacidad de Documentos:</strong> Tus documentos personales (pasaportes, seguros) **nunca** se suben a la nube ni a ningún servidor. La App solo crea un enlace privado en la memoria de tu teléfono para que los tengas a mano.</li>
+          <li><strong>Sincronización Automática:</strong> En cuanto tu móvil recupere la conexión, la guía se actualizará sola con las últimas alertas y avisos de seguridad.</li>
+          <li><strong>Bajo Consumo:</strong> Optimizada para no agotar tu batería durante los desplazamientos largos a las sedes.</li>
         </ul>
       </section>
     </div>

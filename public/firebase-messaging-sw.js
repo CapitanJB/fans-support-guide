@@ -4,12 +4,12 @@ importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-comp
 
 // Configuración de Firebase - Guía Mundial 2026
 const firebaseConfig = {
-  apiKey: "AIzaSyDr21-1ZNVKrsYRGCTfT0sEGcBhPoASVIk",
-  authDomain: "guia-mundial-2026-fes.firebaseapp.com",
-  projectId: "guia-mundial-2026-fes",
-  storageBucket: "guia-mundial-2026-fes.firebasestorage.app",
-  messagingSenderId: "933027187306",
-  appId: "1:933027187306:web:388e3c3cc295796d629813"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 firebase.initializeApp(firebaseConfig);
