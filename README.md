@@ -42,7 +42,14 @@ npm install
 
 #### Google Sheets (CMS)
 1. Create a Google Sheet with three tabs: `POIs`, `Matches`, and `Timeline`.
-2. Follow the column structure found in `src/services/match-service.ts`.
+2. Follow the column structure found below (the order of columns is critical):
+
+| Tab | Columns (in order) |
+| :--- | :--- |
+| **POIs** | `id`, `nombre`, `categoria`, `latitud`, `longitud`, `descripcion`, `direccion`, `icono`, `ciudad` |
+| **Matches** | `id`, `homeTeam`, `awayTeam`, `date`, `time`, `stadiumId`, `ciudad` |
+| **Timeline** | `matchId`, `type`, `time`, `title`, `description`, `poiId` |
+
 3. Publish to the Web as **CSV**.
 4. Copy the CSV URLs and paste them into your `.env` file.
 
