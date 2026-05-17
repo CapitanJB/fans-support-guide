@@ -120,6 +120,10 @@ export const ui = {
     'emergency.label.consular_houston': 'Emergencia Consular Houston',
     'emergency.label.consular_guadalajara': 'Emergencia Consular Guadalajara',
     'emergency.label.red_cross': 'Cruz Roja',
+    'selector.label': 'Sede y Partido:',
+    'selector.loading': 'Cargando partidos...',
+    'selector.empty': 'No hay partidos disponibles',
+    'selector.venue_fallback': 'Sede',
   },
   en: {
     'site.title': 'Fans Support Guide - World Cup 2026',
@@ -235,5 +239,9 @@ export const ui = {
     'emergency.label.consular_houston': 'Consular Emergency Houston',
     'emergency.label.consular_guadalajara': 'Consular Emergency Guadalajara',
     'emergency.label.red_cross': 'Red Cross',
+    'selector.label': 'Venue and Match:',
+    'selector.loading': 'Loading matches...',
+    'selector.empty': 'No matches available',
+    'selector.venue_fallback': 'Venue',
   }
 };

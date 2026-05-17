@@ -2,13 +2,15 @@
 /**
  * MatchSelector.astro - Selection of the active match context
  */
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
 <section class="match-selector-container">
-  <label for="match-select">Sede y Partido:</label>
+  <label for="match-select">{t('selector.label')}</label>
   <div class="select-wrapper">
     <select id="match-select" class="match-select">
-      <option value="" disabled selected>Cargando partidos...</option>
+      <option value="" disabled selected>{t('selector.loading')}</option>
     </select>
     <span class="select-arrow">▼</span>
   </div>
@@ -66,18 +68,23 @@
   }
 </style>
 
-<script>
-  import { getSurvivalData, type Match } from '../services/match-service';
+<script is:inline define:vars={{
+  emptyMsg: t('selector.empty'),
+  venueFallback: t('selector.venue_fallback')
+}}>
+  import { getSurvivalData } from '../services/match-service';
 
-  const select = document.getElementById('match-select') as HTMLSelectElement;
+  const select = document.getElementById('match-select');
   const STORAGE_KEY = 'selected_match_id';
 
   async function initSelector() {
     try {
       const { matches } = await getSurvivalData();
       
+      if (!select) return;
+
       if (matches.length === 0) {
-        select.innerHTML = '<option value="">No hay partidos disponibles</option>';
+        select.innerHTML = `<option value="">${emptyMsg}</option>`;
         return;
       }
 
@@ -87,7 +94,7 @@
         const dateParts = m.date.split('/');
         const dateFormatted = dateParts.length === 3 ? `${dateParts[0]}/${dateParts[1]}` : m.date;
         
-        return `<option value="${m.id}">${dateFormatted} - ${m.homeTeam} vs ${m.awayTeam} - ${m.ciudad || m.stadium?.ciudad || 'Sede'}</option>`;
+        return `<option value="${m.id}">${dateFormatted} - ${m.homeTeam} vs ${m.awayTeam} - ${m.ciudad || m.stadium?.ciudad || venueFallback}</option>`;
       }).join('');
 
       // Determine initial selection
@@ -115,7 +122,10 @@
       select.value = selectedId;
       
       // Dispatch initial state
-      dispatchMatchChange(selectedId, matches.find(m => m.id === selectedId)!);
+      const initialMatch = matches.find(m => m.id === selectedId);
+      if (initialMatch) {
+        dispatchMatchChange(selectedId, initialMatch);
+      }
 
       // Listen for changes
       select.addEventListener('change', () => {
@@ -131,7 +141,7 @@
     }
   }
 
-  function dispatchMatchChange(id: string, match: Match) {
+  function dispatchMatchChange(id, match) {
     console.log('Dispatching match:selected', id);
     window.dispatchEvent(new CustomEvent('match:selected', {
       detail: { id, match }
