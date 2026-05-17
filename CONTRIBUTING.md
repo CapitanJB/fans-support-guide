@@ -36,7 +36,7 @@ Thank you for your interest in contributing! This project is an open-source boil
 
 ## 📝 Pull Request Guidelines
 
-- All changes should be submitted via a **Pull Request** to the `develop` branch.
+- All changes should be submitted via a **Pull Request** to the `main` branch.
 - Use the provided PR template to describe your changes.
 - Ensure your code follows the project's style (Astro, TypeScript).
 - If you add a new component or feature, please update the documentation in the `README.md` or `i18n` dictionary if applicable.
