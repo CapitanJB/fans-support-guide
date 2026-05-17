@@ -1,14 +1,16 @@
 ---
 // DocumentVault.astro - Component for offline survival documents
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
 <div id="vault-container">
-  <h2>📁 Carpeta Digital</h2>
-  <p class="description">Guarda copias de tu pasaporte y documentos críticos. Se almacenan solo en este dispositivo.</p>
+  <h2>{t('vault.title')}</h2>
+  <p class="description">{t('vault.description')}</p>
 
   <div class="upload-area">
     <label for="file-upload" class="custom-file-upload">
-      ➕ Añadir Documento
+      {t('vault.add_btn')}
     </label>
     <input id="file-upload" type="file" accept="image/*,application/pdf" />
   </div>
@@ -58,10 +60,14 @@
   /* Los items de la lista se inyectarán vía JS */
 </style>
 
-<script>
-  import { saveDocument, getAllDocuments, deleteDocument, type OfflineDocument } from '../services/db';
+<script is:inline define:vars={{
+  emptyMsg: t('vault.empty'),
+  viewBtnText: t('vault.view_btn'),
+  deleteConfirm: t('vault.delete_confirm')
+}}>
+  import { saveDocument, getAllDocuments, deleteDocument } from '../services/db';
 
-  const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+  const fileInput = document.getElementById('file-upload');
   const docList = document.getElementById('document-list');
 
   const renderDocuments = async () => {
@@ -70,7 +76,7 @@
     const docs = await getAllDocuments();
     
     if (docs.length === 0) {
-      docList.innerHTML = '<li class="empty-msg">No hay documentos guardados aún.</li>';
+      docList.innerHTML = `<li class="empty-msg">${emptyMsg}</li>`;
       return;
     }
 
@@ -81,7 +87,7 @@
           <span class="doc-date">${new Date(doc.date).toLocaleDateString()}</span>
         </div>
         <div class="doc-actions">
-          <button class="btn-view" data-id="${doc.id}">👁️ Ver</button>
+          <button class="btn-view" data-id="${doc.id}">👁️ ${viewBtnText}</button>
           <button class="btn-delete" data-id="${doc.id}">🗑️</button>
         </div>
       </li>
@@ -90,8 +96,8 @@
     // Attach events to dynamic buttons
     document.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        const id = (e.currentTarget as HTMLElement).dataset.id;
-        if (id && confirm('¿Eliminar este documento?')) {
+        const id = e.currentTarget.dataset.id;
+        if (id && confirm(deleteConfirm)) {
           await deleteDocument(id);
           renderDocuments();
         }
@@ -100,7 +106,7 @@
 
     document.querySelectorAll('.btn-view').forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        const id = (e.currentTarget as HTMLElement).dataset.id;
+        const id = e.currentTarget.dataset.id;
         if (id) {
           const allDocs = await getAllDocuments();
           const doc = allDocs.find(d => d.id === id);
@@ -116,7 +122,7 @@
   fileInput?.addEventListener('change', async (e) => {
     const file = fileInput.files?.[0];
     if (file) {
-      const newDoc: OfflineDocument = {
+      const newDoc = {
         id: crypto.randomUUID(),
         name: file.name,
         type: file.type,

@@ -84,32 +84,32 @@ export async function getMatchWeather(match: Match): Promise<WeatherData | null>
 }
 
 /**
- * Returns a human-readable description and emoji for WMO codes
+ * Returns a translation key and emoji for WMO codes
  */
-export function getWeatherDescription(code: number): { text: string; emoji: string } {
-  const codes: Record<number, { text: string; emoji: string }> = {
-    0: { text: 'Despejado', emoji: '☀️' },
-    1: { text: 'Principalmente despejado', emoji: '🌤️' },
-    2: { text: 'Parcialmente nublado', emoji: '⛅' },
-    3: { text: 'Nublado', emoji: '☁️' },
-    45: { text: 'Niebla', emoji: '🌫️' },
-    48: { text: 'Escarcha', emoji: '🌫️' },
-    51: { text: 'Llovizna ligera', emoji: '🌦️' },
-    53: { text: 'Llovizna moderada', emoji: '🌦️' },
-    55: { text: 'Llovizna densa', emoji: '🌦️' },
-    61: { text: 'Lluvia ligera', emoji: '🌧️' },
-    63: { text: 'Lluvia moderada', emoji: '🌧️' },
-    65: { text: 'Lluvia fuerte', emoji: '🌧️' },
-    71: { text: 'Nieve ligera', emoji: '🌨️' },
-    73: { text: 'Nieve moderada', emoji: '🌨️' },
-    75: { text: 'Nieve fuerte', emoji: '🌨️' },
-    80: { text: 'Chubascos ligeros', emoji: '🌦️' },
-    81: { text: 'Chubascos moderados', emoji: '🌦️' },
-    82: { text: 'Chubascos violentos', emoji: '🌧️' },
-    95: { text: 'Tormenta eléctrica', emoji: '⛈️' },
-    96: { text: 'Tormenta con granizo ligero', emoji: '⛈️' },
-    99: { text: 'Tormenta con granizo fuerte', emoji: '⛈️' }
+export function getWeatherInfo(code: number): { key: string; emoji: string } {
+  const codes: Record<number, { key: string; emoji: string }> = {
+    0: { key: 'weather.condition.0', emoji: '☀️' },
+    1: { key: 'weather.condition.1', emoji: '🌤️' },
+    2: { key: 'weather.condition.2', emoji: '⛅' },
+    3: { key: 'weather.condition.3', emoji: '☁️' },
+    45: { key: 'weather.condition.45', emoji: '🌫️' },
+    48: { key: 'weather.condition.48', emoji: '🌫️' },
+    51: { key: 'weather.condition.51', emoji: '🌦️' },
+    53: { key: 'weather.condition.53', emoji: '🌦️' },
+    55: { key: 'weather.condition.55', emoji: '🌦️' },
+    61: { key: 'weather.condition.61', emoji: '🌧️' },
+    63: { key: 'weather.condition.63', emoji: '🌧️' },
+    65: { key: 'weather.condition.65', emoji: '🌧️' },
+    71: { key: 'weather.condition.71', emoji: '🌨️' },
+    73: { key: 'weather.condition.73', emoji: '🌨️' },
+    75: { key: 'weather.condition.75', emoji: '🌨️' },
+    80: { key: 'weather.condition.80', emoji: '🌦️' },
+    81: { key: 'weather.condition.81', emoji: '🌦️' },
+    82: { key: 'weather.condition.82', emoji: '🌧️' },
+    95: { key: 'weather.condition.95', emoji: '⛈️' },
+    96: { key: 'weather.condition.96', emoji: '⛈️' },
+    99: { key: 'weather.condition.99', emoji: '⛈️' }
   };
 
-  return codes[code] || { text: 'Desconocido', emoji: '🌡️' };
+  return codes[code] || { key: 'weather.condition.unknown', emoji: '🌡️' };
 }

@@ -2,6 +2,8 @@
 /**
  * VenueSearch.astro - Instant stadium search and navigation
  */
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
 <div class="search-container">
@@ -10,7 +12,7 @@
     <input 
       type="text" 
       id="venue-input" 
-      placeholder="Busca estadios, fan zones, hospitales..." 
+      placeholder={t('search.placeholder')} 
       autocomplete="off"
     />
   </div>
@@ -120,16 +122,26 @@
   }
 </style>
 
-<script>
-  import { fetchPOIs, type PointOfInterest } from '../services/data-fetch';
+<script is:inline define:vars={{
+  emptyMsg: t('search.empty'),
+  categoryTranslations: {
+    'Estadio': t('categories.stadium'),
+    'Salud': t('categories.health'),
+    'Seguridad': t('categories.security'),
+    'Transporte': t('categories.transport'),
+    'FanZone': t('categories.fanzone'),
+    'Parking': t('categories.parking')
+  }
+}}>
+  import { fetchPOIs } from '../services/data-fetch';
 
-  let allPois: PointOfInterest[] = [];
-  let currentCity: string = '';
+  let allPois = [];
+  let currentCity = '';
   
-  const input = document.getElementById('venue-input') as HTMLInputElement;
+  const input = document.getElementById('venue-input');
   const resultsContainer = document.getElementById('search-results');
 
-  const getEmojiForCategory = (category: string) => {
+  const getEmojiForCategory = (category) => {
     const cat = category.toLowerCase();
     if (cat.includes('estadio')) return '🏟️';
     if (cat.includes('salud') || cat.includes('hospital')) return '🏥';
@@ -144,7 +156,7 @@
     allPois = await fetchPOIs();
 
     input?.addEventListener('input', (e) => {
-      const term = (e.target as HTMLInputElement).value.toLowerCase().trim();
+      const term = e.target.value.toLowerCase().trim();
       
       if (term.length < 2) {
         resultsContainer?.classList.add('hidden');
@@ -153,66 +165,66 @@
 
       let filtered = allPois;
       
-      // Filter by city if context exists, but keep safety globally (same as map logic)
       if (currentCity) {
         filtered = filtered.filter(p => p.ciudad === currentCity || p.categoria === 'Seguridad');
       }
 
-      filtered = filtered.filter(v => 
-        v.nombre.toLowerCase().includes(term) || 
-        v.categoria.toLowerCase().includes(term) ||
-        v.direccion.toLowerCase().includes(term)
-      );
+      filtered = filtered.filter(v => {
+        const translatedCat = categoryTranslations[v.categoria] || v.categoria;
+        return v.nombre.toLowerCase().includes(term) || 
+               v.categoria.toLowerCase().includes(term) ||
+               translatedCat.toLowerCase().includes(term) ||
+               v.direccion.toLowerCase().includes(term);
+      });
 
       renderResults(filtered);
     });
 
-    // Listen for match selection to update search context
-    window.addEventListener('match:selected', (e: any) => {
+    window.addEventListener('match:selected', (e) => {
       currentCity = e.detail.match.ciudad;
-      input.value = ''; // Clear search when context changes
+      input.value = ''; 
       resultsContainer?.classList.add('hidden');
     });
 
-    // Close results when clicking outside
     document.addEventListener('click', (e) => {
-      if (!input?.contains(e.target as Node) && !resultsContainer?.contains(e.target as Node)) {
+      if (!input?.contains(e.target) && !resultsContainer?.contains(e.target)) {
         resultsContainer?.classList.add('hidden');
       }
     });
   };
 
-  const renderResults = (filtered: PointOfInterest[]) => {
+  const renderResults = (filtered) => {
     if (!resultsContainer) return;
     
     resultsContainer.classList.remove('hidden');
 
     if (filtered.length === 0) {
-      resultsContainer.innerHTML = '<div class="empty-msg">No se encontraron resultados en esta zona.</div>';
+      resultsContainer.innerHTML = `<div class="empty-msg">${emptyMsg}</div>`;
       return;
     }
 
-    resultsContainer.innerHTML = filtered.map(v => `
-      <div class="result-item" data-lat="${v.latitud}" data-lon="${v.longitud}">
-        <div class="result-icon">${getEmojiForCategory(v.categoria)}</div>
-        <div class="result-text">
-          <span class="venue-name">${v.nombre}</span>
-          <div class="venue-meta">
-            <span class="venue-cat">${v.categoria}</span> • 
-            <span class="venue-city">${v.direccion}</span>
+    resultsContainer.innerHTML = filtered.map(v => {
+      const translatedCat = categoryTranslations[v.categoria] || v.categoria;
+      return `
+        <div class="result-item" data-lat="${v.latitud}" data-lon="${v.longitud}">
+          <div class="result-icon">${getEmojiForCategory(v.categoria)}</div>
+          <div class="result-text">
+            <span class="venue-name">${v.nombre}</span>
+            <div class="venue-meta">
+              <span class="venue-cat">${translatedCat}</span> • 
+              <span class="venue-city">${v.direccion}</span>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
-    // Event delegation for result selection
     resultsContainer.querySelectorAll('.result-item').forEach(item => {
       item.addEventListener('click', () => {
-        const lat = parseFloat((item as HTMLElement).dataset.lat || '0');
-        const lon = parseFloat((item as HTMLElement).dataset.lon || '0');
-        const name = (item as HTMLElement).querySelector('.venue-name')?.textContent || '';
+        const lat = parseFloat(item.dataset.lat || '0');
+        const lon = parseFloat(item.dataset.lon || '0');
+        const name = item.querySelector('.venue-name')?.textContent || '';
 
-        // Dispatch custom event to Map
         window.dispatchEvent(new CustomEvent('map:center', {
           detail: { lat, lon, name }
         }));
@@ -223,7 +235,6 @@
     });
   };
 
-  // Run on client load
   document.addEventListener('astro:page-load', initSearch);
   if (document.readyState === 'complete') initSearch();
   else window.addEventListener('load', initSearch);

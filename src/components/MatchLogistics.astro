@@ -2,12 +2,14 @@
 /**
  * MatchLogistics.astro - Flexible information blocks for the selected match
  */
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
 <section id="match-logistics" class="logistics-container hidden">
   <div class="logistics-card">
     <header class="logistics-header">
-      <h3>ℹ️ Información del Partido</h3>
+      <h3>{t('logistics.title')}</h3>
     </header>
     <div id="logistics-grid" class="logistics-list">
       <!-- Dynamic info items -->
@@ -183,13 +185,15 @@
   .hidden { display: none; }
 </style>
 
-<script>
-  import { getSurvivalData, type TimelineEvent } from '../services/match-service';
+<script is:inline define:vars={{
+  viewMapText: t('logistics.view_map')
+}}>
+  import { getSurvivalData } from '../services/match-service';
 
   const container = document.getElementById('match-logistics');
   const grid = document.getElementById('logistics-grid');
 
-  async function updateLogistics(matchId: string) {
+  async function updateLogistics(matchId) {
     if (!container || !grid) return;
 
     try {
@@ -217,7 +221,7 @@
         const poiButton = event.poi 
           ? `<div class="card-actions">
                <button class="btn-poi" data-lat="${event.poi.latitud}" data-lon="${event.poi.longitud}" data-name="${event.poi.nombre}">
-                 📍 Ver ubicación
+                 ${viewMapText}
                </button>
              </div>` 
           : '';
@@ -242,7 +246,7 @@
       // Add click listeners to POI buttons
       grid.querySelectorAll('.btn-poi').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const target = e.currentTarget as HTMLElement;
+          const target = e.currentTarget;
           const lat = parseFloat(target.dataset.lat || '0');
           const lon = parseFloat(target.dataset.lon || '0');
           const name = target.dataset.name || '';
@@ -258,29 +262,29 @@
     }
   }
 
-  function getTypeCode(type: string): string {
+  function getTypeCode(type) {
     const t = type.toLowerCase();
     if (t.includes('alerta') || t.includes('seguridad')) return 'type-alert';
-    if (t.includes('transporte') || t.includes('logística')) return 'type-logistics';
-    if (t.includes('partido') || t.includes('evento')) return 'type-event';
-    if (t.includes('enlace')) return 'type-link';
+    if (t.includes('transporte') || t.includes('logística') || t.includes('logistics')) return 'type-logistics';
+    if (t.includes('partido') || t.includes('match') || t.includes('evento') || t.includes('event')) return 'type-event';
+    if (t.includes('enlace') || t.includes('link')) return 'type-link';
     return '';
   }
 
-  function getIconForType(type: string): string {
+  function getIconForType(type) {
     const t = type.toLowerCase();
     if (t.includes('meeting')) return '🚩';
-    if (t.includes('marcha')) return '👣';
-    if (t.includes('apertura')) return '🏟️';
-    if (t.includes('alerta')) return '⚠️';
-    if (t.includes('seguridad')) return '🚔';
-    if (t.includes('transporte')) return '🚌';
-    if (t.includes('enlace')) return '🔗';
+    if (t.includes('marcha') || t.includes('walk')) return '👣';
+    if (t.includes('apertura') || t.includes('opening')) return '🏟️';
+    if (t.includes('alerta') || t.includes('alert')) return '⚠️';
+    if (t.includes('seguridad') || t.includes('security')) return '🚔';
+    if (t.includes('transporte') || t.includes('transport')) return '🚌';
+    if (t.includes('enlace') || t.includes('link')) return '🔗';
     return 'ℹ️';
   }
 
   // Listen for match selection
-  window.addEventListener('match:selected', (e: any) => {
+  window.addEventListener('match:selected', (e) => {
     updateLogistics(e.detail.id);
   });
 </script>

@@ -3,12 +3,14 @@
  * Weather Widget Component
  * Displays specific weather forecast for the selected match
  */
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
 <section class="weather-widget">
-  <h3>⛅ Pronóstico del tiempo para el partido</h3>
+  <h3>⛅ {t('weather.title')}</h3>
   <div id="weather-match-container">
-    <div class="weather-skeleton">Selecciona un partido para ver el clima...</div>
+    <div class="weather-skeleton">{t('weather.select_match')}</div>
   </div>
 </section>
 
@@ -149,18 +151,50 @@
   }
 </style>
 
-<script>
-  import { getMatchWeather, getWeatherDescription } from '../services/weather-service';
-  import type { Match } from '../services/match-service';
+<script is:inline define:vars={{ 
+  consultingText: t('weather.consulting'),
+  noForecastText: t('weather.no_forecast'),
+  staleText: t('weather.stale'),
+  staleAtText: t('weather.stale_at'),
+  errorText: t('weather.error'),
+  viewDetailText: t('weather.view_detail'),
+  venueLabel: t('map.venue_label'),
+  // Weather conditions dictionary
+  conditions: {
+    'weather.condition.0': t('weather.condition.0'),
+    'weather.condition.1': t('weather.condition.1'),
+    'weather.condition.2': t('weather.condition.2'),
+    'weather.condition.3': t('weather.condition.3'),
+    'weather.condition.45': t('weather.condition.45'),
+    'weather.condition.48': t('weather.condition.48'),
+    'weather.condition.51': t('weather.condition.51'),
+    'weather.condition.53': t('weather.condition.53'),
+    'weather.condition.55': t('weather.condition.55'),
+    'weather.condition.61': t('weather.condition.61'),
+    'weather.condition.63': t('weather.condition.63'),
+    'weather.condition.65': t('weather.condition.65'),
+    'weather.condition.71': t('weather.condition.71'),
+    'weather.condition.73': t('weather.condition.73'),
+    'weather.condition.75': t('weather.condition.75'),
+    'weather.condition.80': t('weather.condition.80'),
+    'weather.condition.81': t('weather.condition.81'),
+    'weather.condition.82': t('weather.condition.82'),
+    'weather.condition.95': t('weather.condition.95'),
+    'weather.condition.96': t('weather.condition.96'),
+    'weather.condition.99': t('weather.condition.99'),
+    'weather.condition.unknown': t('weather.condition.unknown')
+  }
+}}>
+  import { getMatchWeather, getWeatherInfo } from '../services/weather-service';
 
-  let currentMatch: Match | null = null;
+  let currentMatch = null;
 
-  async function updateMatchWeather(match: Match) {
+  async function updateMatchWeather(match) {
     const container = document.getElementById('weather-match-container');
     if (!container) return;
 
     currentMatch = match;
-    container.innerHTML = '<div class="weather-skeleton">Consultando satélites...</div>';
+    container.innerHTML = `<div class="weather-skeleton">${consultingText}</div>`;
 
     try {
       const data = await getMatchWeather(match);
@@ -169,12 +203,12 @@
         container.innerHTML = `
         <div class="weather-card-large">
           <div class="weather-info">
-            <span class="match-venue">📍 ${match.stadium?.nombre || 'Estadio'}</span>
+            <span class="match-venue">📍 ${match.stadium?.nombre || venueLabel}</span>
             <hr class="venue-separator" />
             <span class="match-teams"><strong>${match.homeTeam} vs ${match.awayTeam}</strong></span><br />
             <span class="match-date">📅 ${match.date}</span>
             <div class="no-forecast-inline">
-              ⏳ El pronóstico estará disponible 14 días antes.
+              ${noForecastText}
             </div>
           </div>
         </div>
@@ -182,15 +216,16 @@
         return;
       }
 
-      const { text, emoji } = getWeatherDescription(data.condition);
+      const { key, emoji } = getWeatherInfo(data.condition);
+      const text = conditions[key] || conditions['weather.condition.unknown'];
       const staleLabel = data.isStale 
-        ? `<div class="stale-info">⚠️ Datos sin conexión (Act. ${data.staleTime})</div>` 
+        ? `<div class="stale-info">${staleText} ${staleAtText.replace('{time}', data.staleTime)}</div>` 
         : '';
 
       container.innerHTML = `
         <div class="weather-card-large">
           <div class="weather-info">
-            <span class="match-venue">📍 ${match.stadium?.nombre || 'Estadio'}</span>
+            <span class="match-venue">📍 ${match.stadium?.nombre || venueLabel}</span>
             <hr class="venue-separator" />
             <span class="match-teams"><strong>${match.homeTeam} vs ${match.awayTeam}</strong></span><br />
             <span class="match-date">📅 ${match.date}</span>
@@ -203,16 +238,16 @@
           <div class="weather-icon-large">${emoji}</div>
         </div>
         <div class="weather-footer">
-          <a href="https://www.google.com/search?q=clima+${encodeURIComponent(match.ciudad||match.stadium?.nombre||'')}+${match.date}" target="_blank" rel="noopener noreferrer" class="weather-detail-link">Ver predicción detallada ↗</a>
+          <a href="https://www.google.com/search?q=weather+${encodeURIComponent(match.ciudad||match.stadium?.nombre||'')}+${match.date}" target="_blank" rel="noopener noreferrer" class="weather-detail-link">${viewDetailText}</a>
         </div>
       `;
     } catch (error) {
-      container.innerHTML = '<div class="weather-skeleton">Error al cargar datos de clima.</div>';
+      container.innerHTML = `<div class="weather-skeleton">${errorText}</div>`;
     }
   }
 
   // Listen for match selection events
-  window.addEventListener('match:selected', (e: any) => {
+  window.addEventListener('match:selected', (e) => {
     updateMatchWeather(e.detail.match);
   });
 
