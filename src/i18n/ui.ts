@@ -124,6 +124,11 @@ export const ui = {
     'selector.loading': 'Cargando partidos...',
     'selector.empty': 'No hay partidos disponibles',
     'selector.venue_fallback': 'Sede',
+    'notif.banner_text': '🔔 Recibe alertas críticas de seguridad y transporte en tiempo real.',
+    'notif.subscribe_btn': 'Activar Alertas',
+    'notif.toast_title': 'Alerta',
+    'notif.success_title': '¡Éxito!',
+    'notif.success_body': 'Alertas activadas correctamente.',
   },
   en: {
     'site.title': 'Fans Support Guide - World Cup 2026',
@@ -243,5 +248,10 @@ export const ui = {
     'selector.loading': 'Loading matches...',
     'selector.empty': 'No matches available',
     'selector.venue_fallback': 'Venue',
+    'notif.banner_text': '🔔 Receive critical security and transport alerts in real time.',
+    'notif.subscribe_btn': 'Enable Alerts',
+    'notif.toast_title': 'Alert',
+    'notif.success_title': 'Success!',
+    'notif.success_body': 'Alerts enabled correctly.',
   }
 };

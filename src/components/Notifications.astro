@@ -1,11 +1,13 @@
 ---
 // Notifications.astro - Component for Firebase Messaging
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
 <div id="notif-container" class="hidden">
   <div class="notif-banner">
-    <p>🔔 Recibe alertas críticas de seguridad y transporte en tiempo real.</p>
-    <button id="btn-subscribe">Activar Alertas</button>
+    <p>{t('notif.banner_text')}</p>
+    <button id="btn-subscribe">{t('notif.subscribe_btn')}</button>
   </div>
 </div>
 
@@ -13,7 +15,7 @@
   <div class="toast-content">
     <span class="toast-icon">⚠️</span>
     <div class="toast-text">
-      <strong id="toast-title">Alerta</strong>
+      <strong id="toast-title">{t('notif.toast_title')}</strong>
       <p id="toast-body"></p>
     </div>
   </div>
@@ -89,7 +91,12 @@
   #toast-close:hover { color: var(--text-primary); }
 </style>
 
-<script>
+<script is:inline define:vars={{
+  successTitle: t('notif.success_title'),
+  successBody: t('notif.success_body'),
+  defaultToastTitle: t('notif.toast_title'),
+  apiKey: "YOUR_API_KEY" // Fallback to avoid breaking if config is missing
+}}>
   import { initializeApp } from "firebase/app";
   import { getMessaging, getToken, onMessage } from "firebase/messaging";
   import { firebaseConfig, VAPID_KEY } from "../services/firebase-config";
@@ -114,7 +121,7 @@
 
   const initNotifications = async () => {
     // Si no se han puesto las credenciales reales todavía, no intentamos nada
-    if (firebaseConfig.apiKey === "YOUR_API_KEY") return;
+    if (firebaseConfig.apiKey === apiKey) return;
 
     const container = document.getElementById('notif-container');
     const btn = document.getElementById('btn-subscribe');
@@ -147,7 +154,7 @@
           if (currentToken) {
             console.log('Token FCM:', currentToken);
             container?.classList.add('hidden');
-            showToast('¡Éxito!', 'Alertas activadas correctamente.');
+            showToast(successTitle, successBody);
           }
         }
       } catch (error) {
@@ -160,7 +167,7 @@
     const messaging = getMessaging(app);
     onMessage(messaging, (payload) => {
       console.log('Mensaje recibido en primer plano:', payload);
-      showToast(payload.notification?.title || 'Alerta', payload.notification?.body || '');
+      showToast(payload.notification?.title || defaultToastTitle, payload.notification?.body || '');
     });
   };
 
