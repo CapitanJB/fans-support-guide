@@ -1,0 +1,241 @@
+---
+/**
+ * VenueSearch.astro - Instant stadium search and navigation
+ */
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
+---
+
+<div class="search-container">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input 
+      type="text" 
+      id="venue-input" 
+      placeholder={t('search.placeholder')} 
+      autocomplete="off"
+    />
+  </div>
+  <div id="search-results" class="search-results hidden">
+    <!-- Dynamic results -->
+  </div>
+</div>
+
+<style>
+  .search-container {
+    position: relative;
+    margin-bottom: 1rem;
+    z-index: 1100; /* Over map controls (Leaflet is usually 1000) */
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border: 2px solid var(--text-primary);
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 4px 6px var(--card-shadow);
+  }
+
+  .search-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+
+  #venue-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 10px 20px var(--card-shadow);
+    z-index: 10;
+  }
+
+  .hidden { display: none; }
+
+  .result-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+  }
+
+  .result-item:hover {
+    background: var(--bg-primary);
+  }
+
+  .result-item:last-child { border-bottom: none; }
+
+  .result-icon {
+    font-size: 1.4rem;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  .result-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .venue-name {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .venue-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .empty-msg {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+</style>
+
+<script is:inline define:vars={{
+  emptyMsg: t('search.empty'),
+  categoryTranslations: {
+    'Estadio': t('categories.stadium'),
+    'Salud': t('categories.health'),
+    'Seguridad': t('categories.security'),
+    'Transporte': t('categories.transport'),
+    'FanZone': t('categories.fanzone'),
+    'Parking': t('categories.parking')
+  }
+}}>
+  import { fetchPOIs } from '../services/data-fetch';
+
+  let allPois = [];
+  let currentCity = '';
+  
+  const input = document.getElementById('venue-input');
+  const resultsContainer = document.getElementById('search-results');
+
+  const getEmojiForCategory = (category) => {
+    const cat = category.toLowerCase();
+    if (cat.includes('estadio')) return '🏟️';
+    if (cat.includes('salud') || cat.includes('hospital')) return '🏥';
+    if (cat.includes('seguridad') || cat.includes('policía')) return '🛡️';
+    if (cat.includes('transporte') || cat.includes('metro') || cat.includes('bus')) return '🚌';
+    if (cat.includes('fan') || cat.includes('zone')) return '🎉';
+    if (cat.includes('parking')) return '🅿️';
+    return '📍';
+  };
+
+  const initSearch = async () => {
+    allPois = await fetchPOIs();
+
+    input?.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      
+      if (term.length < 2) {
+        resultsContainer?.classList.add('hidden');
+        return;
+      }
+
+      let filtered = allPois;
+      
+      if (currentCity) {
+        filtered = filtered.filter(p => p.city === currentCity || p.category === 'Seguridad');
+      }
+
+      filtered = filtered.filter(v => {
+        const translatedCat = categoryTranslations[v.category] || v.category;
+        return v.name.toLowerCase().includes(term) || 
+               v.category.toLowerCase().includes(term) ||
+               translatedCat.toLowerCase().includes(term) ||
+               v.address.toLowerCase().includes(term);
+      });
+
+      renderResults(filtered);
+    });
+
+    window.addEventListener('match:selected', (e) => {
+      currentCity = e.detail.match.city;
+      input.value = ''; 
+      resultsContainer?.classList.add('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!input?.contains(e.target) && !resultsContainer?.contains(e.target)) {
+        resultsContainer?.classList.add('hidden');
+      }
+    });
+  };
+
+  const renderResults = (filtered) => {
+    if (!resultsContainer) return;
+    
+    resultsContainer.classList.remove('hidden');
+
+    if (filtered.length === 0) {
+      resultsContainer.innerHTML = `<div class="empty-msg">${emptyMsg}</div>`;
+      return;
+    }
+
+    resultsContainer.innerHTML = filtered.map(v => {
+      const translatedCat = categoryTranslations[v.category] || v.category;
+      return `
+        <div class="result-item" data-lat="${v.latitude}" data-lon="${v.longitude}">
+          <div class="result-icon">${getEmojiForCategory(v.category)}</div>
+          <div class="result-text">
+            <span class="venue-name">${v.name}</span>
+            <div class="venue-meta">
+              <span class="venue-cat">${translatedCat}</span> • 
+              <span class="venue-city">${v.address}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    resultsContainer.querySelectorAll('.result-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const lat = parseFloat(item.dataset.lat || '0');
+        const lon = parseFloat(item.dataset.lon || '0');
+        const name = item.querySelector('.venue-name')?.textContent || '';
+
+        window.dispatchEvent(new CustomEvent('map:center', {
+          detail: { lat, lon, name }
+        }));
+
+        input.value = name;
+        resultsContainer.classList.add('hidden');
+      });
+    });
+  };
+
+  document.addEventListener('astro:page-load', initSearch);
+  if (document.readyState === 'complete') initSearch();
+  else window.addEventListener('load', initSearch);
+</script>

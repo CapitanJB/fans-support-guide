@@ -1,0 +1,326 @@
+---
+import Map from '../components/Map.astro';
+import Notifications from '../components/Notifications.astro';
+import WeatherWidget from '../components/WeatherWidget.astro';
+import MatchSelector from '../components/MatchSelector.astro';
+import MatchLogistics from '../components/MatchLogistics.astro';
+import VenueSearch from '../components/VenueSearch.astro';
+import StadiumRules from '../components/StadiumRules.astro';
+import DocumentVault from '../components/DocumentVault.astro';
+import EmergencyContacts from '../components/EmergencyContacts.astro';
+import AboutModal from '../components/AboutModal.astro';
+import ContactModal from '../components/ContactModal.astro';
+
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/logos/logo.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={t('site.description')} />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		
+		<!-- Theme Management Script (Prevent FOUC) -->
+		<script is:inline>
+			const theme = (() => {
+				if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+					return localStorage.getItem('theme');
+				}
+				if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					return 'dark';
+				}
+				return 'light';
+			})();
+			document.documentElement.setAttribute('data-theme', theme);
+		</script>
+
+		<script is:inline src="/registerSW.js"></script>
+		<title>{t('site.title')}</title>
+		<style is:global>
+			*, *::before, *::after {
+				box-sizing: border-box;
+			}
+
+			html, body {
+				max-width: 100vw;
+				overflow-x: hidden;
+				margin: 0;
+				padding: 0;
+			}
+
+			img, svg, video, canvas, audio, iframe, embed, object {
+				display: block;
+				max-width: 100%;
+				height: auto;
+			}
+
+			/* Evitar que palabras largas rompan el layout */
+			p, h1, h2, h3, h4, h5, h6, span, a, li, strong, div {
+				overflow-wrap: break-word;
+				word-break: break-word;
+			}
+
+			:root {
+				--bg-primary: #f4f4f4;
+				--bg-secondary: #ffffff;
+				--text-primary: #1a1a1a;
+				--text-secondary: #666666;
+				--accent: #d32f2f;
+				--border: #dddddd;
+				--status-online: #e3f2fd;
+				--status-online-text: #0d47a1;
+				--status-offline: #fff3e0;
+				--status-offline-text: #e65100;
+				--card-shadow: rgba(0,0,0,0.1);
+			}
+
+			[data-theme='dark'] {
+				--bg-primary: #121212;
+				--bg-secondary: #1e1e1e;
+				--text-primary: #e0e0e0;
+				--text-secondary: #b0b0b0;
+				--accent: #ff5252;
+				--border: #333333;
+				--status-online: #1a237e;
+				--status-online-text: #bbdefb;
+				--status-offline: #4e342e;
+				--status-offline-text: #ffe0b2;
+				--card-shadow: rgba(0,0,0,0.5);
+			}
+
+			[data-theme='power-save'] {
+				--bg-primary: #000000;
+				--bg-secondary: #000000;
+				--text-primary: #ffffff;
+				--text-secondary: #aaaaaa;
+				--accent: #ff0000;
+				--border: #ffffff;
+				--status-online: #0000ff;
+				--status-online-text: #ffffff;
+				--status-offline: #ff8800;
+				--status-offline-text: #000000;
+				--card-shadow: none;
+			}
+
+			body {
+				font-family: system-ui, -apple-system, sans-serif;
+				line-height: 1.5;
+				background-color: var(--bg-primary);
+				color: var(--text-primary);
+				transition: background-color 0.3s, color 0.3s;
+			}
+			main {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 1rem;
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				min-width: 0; /* Permitir encoger */
+			}
+			header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				border-bottom: 2px solid var(--text-primary);
+				margin-bottom: 1rem;
+				padding-bottom: 0.5rem;
+				gap: 1rem;
+				width: 100%;
+			}
+
+			@media (max-width: 600px) {
+				main {
+					padding: 0.75rem;
+				}
+				header {
+					flex-direction: column;
+					align-items: stretch;
+					gap: 0.75rem;
+				}
+				.header-logo-container {
+					justify-content: center;
+					flex-wrap: wrap; /* Permitir que logos bajen */
+				}
+				h1 {
+					text-align: center;
+					font-size: 1.1rem !important;
+				}
+			}
+
+			.header-logo-container {
+				background: #ffffff;
+				padding: 4px 8px;
+				border-radius: 8px;
+				display: flex;
+				align-items: center;
+				box-shadow: 0 2px 4px var(--card-shadow);
+				max-width: 100%;
+			}
+			.header-logo {
+				height: 40px;
+				width: auto;
+				max-width: 150px; /* Limitar ancho logo */
+				object-fit: contain;
+			}
+			h1 {
+				margin: 0;
+				font-size: 1.2rem;
+				flex: 1;
+				min-width: 0;
+			}
+			.theme-toggle {
+				background: var(--bg-secondary);
+				border: 1px solid var(--border);
+				color: var(--text-primary);
+				padding: 0.5rem;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 0.9rem;
+			}
+			.status {
+				padding: 0.5rem 1rem;
+				border-radius: 4px;
+				margin-bottom: 1rem;
+				font-weight: bold;
+				display: block;
+				text-align: center;
+				width: 100%;
+				max-width: 100%;
+			}
+
+			/* Fix para Leaflet Attribution y otros elementos que se salen */
+			.leaflet-control-attribution {
+				font-size: 8px !important;
+				max-width: 60vw;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.leaflet-container {
+				width: 100% !important;
+				max-width: 100% !important;
+			}
+			.power-save-badge {
+				background: #ffeb3b;
+				color: #000;
+				padding: 0.2rem 0.5rem;
+				border-radius: 10px;
+				font-size: 0.7rem;
+				margin-left: 0.5rem;
+				display: none;
+			}
+
+			/* Estilos globales para enlaces (Ticket MUNDIAL-48) */
+			a {
+				color: #d32f2f;
+				font-weight: bold;
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<div class="header-logo-container" style="gap: 8px;">
+					<img src="/logos/logo.svg" alt="Project Logo" class="header-logo" />
+					<!-- <img src="/logos/logo.png" alt="Logo" class="header-logo" /> -->
+				</div>
+				<h1>{t('header.title')}</h1>
+				<div style="display: flex; gap: 0.5rem;">
+					<AboutModal />
+					<ContactModal />
+					<button id="theme-btn" class="theme-toggle" title={t('header.theme_toggle')}>🌙</button>
+				</div>
+			</header>
+
+			<div id="status-badge" class="status">{t('status.loading')}</div>
+			<span id="battery-status" class="power-save-badge">{t('status.battery_save')}</span>
+			
+			<MatchSelector />
+			
+			<Notifications />
+
+			<WeatherWidget />
+
+			<MatchLogistics />
+
+			<VenueSearch />
+			<Map />
+			<StadiumRules />
+
+			<DocumentVault />
+
+			<EmergencyContacts />
+		</main>
+
+		<script is:inline define:vars={{ onlineText: t('status.online'), offlineText: t('status.offline') }}>
+			// Status Management
+			const badge = document.getElementById('status-badge');
+			const updateStatus = () => {
+				if (navigator.onLine) {
+					badge.textContent = onlineText;
+					badge.style.background = 'var(--status-online)';
+					badge.style.color = 'var(--status-online-text)';
+				} else {
+					badge.textContent = offlineText;
+					badge.style.background = 'var(--status-offline)';
+					badge.style.color = 'var(--status-offline-text)';
+				}
+			};
+			window.addEventListener('online', updateStatus);
+			window.addEventListener('offline', updateStatus);
+			updateStatus();
+
+			// Theme & Battery Management
+			const themeBtn = document.getElementById('theme-btn');
+			const batteryBadge = document.getElementById('battery-status');
+
+			const themes = ['light', 'dark', 'power-save'];
+			let currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+
+			const updateTheme = (newTheme) => {
+				document.documentElement.setAttribute('data-theme', newTheme);
+				localStorage.setItem('theme', newTheme);
+				currentTheme = newTheme;
+				themeBtn.textContent = newTheme === 'light' ? '🌙' : (newTheme === 'dark' ? '🔋' : '☀️');
+				
+				if (newTheme === 'power-save') {
+					batteryBadge.style.display = 'inline-block';
+				} else {
+					batteryBadge.style.display = 'none';
+				}
+			};
+
+			themeBtn.addEventListener('click', () => {
+				const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
+				updateTheme(themes[nextIndex]);
+			});
+
+			// Battery API Logic
+			if ('getBattery' in navigator) {
+				// @ts-ignore
+				navigator.getBattery().then(battery => {
+					const checkBattery = () => {
+						if (battery.level <= 0.2 && !battery.charging && currentTheme !== 'power-save') {
+							console.log('Low battery detected, activating Power Save');
+							updateTheme('power-save');
+						}
+					};
+					battery.addEventListener('levelchange', checkBattery);
+					battery.addEventListener('chargingchange', checkBattery);
+					checkBattery();
+				});
+			}
+		</script>
+	</body>
+</html>

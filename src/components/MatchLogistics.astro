@@ -1,0 +1,290 @@
+---
+/**
+ * MatchLogistics.astro - Flexible information blocks for the selected match
+ */
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
+---
+
+<section id="match-logistics" class="logistics-container hidden">
+  <div class="logistics-card">
+    <header class="logistics-header">
+      <h3>{t('logistics.title')}</h3>
+    </header>
+    <div id="logistics-grid" class="logistics-list">
+      <!-- Dynamic info items -->
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .logistics-container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Single solid block container */
+  .logistics-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .logistics-header {
+    padding: 1rem 1.25rem;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logistics-header h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .logistics-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* List Item Style */
+  .info-item {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-item:last-child {
+    border-bottom: none;
+  }
+
+  .info-item:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+
+  [data-theme='dark'] .info-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .card-icon {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: var(--bg-primary);
+    border: 2px solid var(--text-primary);
+    border-radius: 50%;
+    margin-top: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .card-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    gap: 12px;
+  }
+
+  .card-title-group {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap; /* Permitir envolver para evitar overflow */
+  }
+
+  @media (max-width: 480px) {
+    .info-item {
+      padding: 1rem;
+      gap: 1rem;
+    }
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      font-size: 1.2rem;
+    }
+  }
+
+  .card-title {
+    font-weight: 900;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .title-separator {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .card-time {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 1rem;
+    white-space: nowrap;
+    background: var(--bg-primary);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .card-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+    white-space: pre-wrap;
+  }
+
+  .card-actions {
+    margin-top: 1rem;
+  }
+
+  .btn-poi {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+  }
+
+  .btn-poi:hover {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+  }
+
+  /* Type accents */
+  .info-item.type-alert { border-left: 6px solid var(--accent); }
+  .info-item.type-logistics { border-left: 6px solid #2196f3; }
+  .info-item.type-event { border-left: 6px solid #4caf50; }
+  .info-item.type-link { border-left: 6px solid #ff9800; }
+
+  .hidden { display: none; }
+</style>
+
+<script is:inline define:vars={{
+  viewMapText: t('logistics.view_map')
+}}>
+  import { getSurvivalData } from '../services/match-service';
+
+  const container = document.getElementById('match-logistics');
+  const grid = document.getElementById('logistics-grid');
+
+  async function updateLogistics(matchId) {
+    if (!container || !grid) return;
+
+    try {
+      const { timeline } = await getSurvivalData();
+      
+      // Filter events for this match
+      const matchEvents = timeline.filter(e => e.matchId === matchId);
+
+      if (matchEvents.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      
+      grid.innerHTML = matchEvents.map(event => {
+        const typeClass = getTypeCode(event.type);
+        const icon = getIconForType(event.type);
+        
+        // Separator between title and time
+        const timeContent = event.time 
+          ? `<span class="title-separator">|</span> <span class="card-time">${event.time}</span>` 
+          : '';
+
+        const poiButton = event.poi 
+          ? `<div class="card-actions">
+               <button class="btn-poi" data-lat="${event.poi.latitude}" data-lon="${event.poi.longitude}" data-name="${event.poi.name}">
+                 ${viewMapText}
+               </button>
+             </div>` 
+          : '';
+
+        return `
+          <div class="info-item ${typeClass}">
+            <div class="card-icon">${icon}</div>
+            <div class="card-content">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <span class="card-title">${event.title}</span>
+                  ${timeContent}
+                </div>
+              </div>
+              <p class="card-description">${event.description}</p>
+              ${poiButton}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Add click listeners to POI buttons
+      grid.querySelectorAll('.btn-poi').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget;
+          const lat = parseFloat(target.dataset.lat || '0');
+          const lon = parseFloat(target.dataset.lon || '0');
+          const name = target.dataset.name || '';
+
+          window.dispatchEvent(new CustomEvent('map:center', {
+            detail: { lat, lon, name }
+          }));
+        });
+      });
+
+    } catch (error) {
+      console.error('Error loading logistics:', error);
+    }
+  }
+
+  function getTypeCode(type) {
+    const t = type.toLowerCase();
+    if (t.includes('alerta') || t.includes('seguridad')) return 'type-alert';
+    if (t.includes('transporte') || t.includes('logística') || t.includes('logistics')) return 'type-logistics';
+    if (t.includes('partido') || t.includes('match') || t.includes('evento') || t.includes('event')) return 'type-event';
+    if (t.includes('enlace') || t.includes('link')) return 'type-link';
+    return '';
+  }
+
+  function getIconForType(type) {
+    const t = type.toLowerCase();
+    if (t.includes('meeting')) return '🚩';
+    if (t.includes('marcha') || t.includes('walk')) return '👣';
+    if (t.includes('apertura') || t.includes('opening')) return '🏟️';
+    if (t.includes('alerta') || t.includes('alert')) return '⚠️';
+    if (t.includes('seguridad') || t.includes('security')) return '🚔';
+    if (t.includes('transporte') || t.includes('transport')) return '🚌';
+    if (t.includes('enlace') || t.includes('link')) return '🔗';
+    return 'ℹ️';
+  }
+
+  // Listen for match selection
+  window.addEventListener('match:selected', (e) => {
+    updateLogistics(e.detail.id);
+  });
+</script>

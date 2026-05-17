@@ -1,0 +1,169 @@
+---
+// AboutModal.astro
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
+---
+
+<button id="about-open-btn" class="about-btn" title={t('about.title')}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+</button>
+
+<dialog id="about-dialog" class="about-modal">
+  <div class="modal-content">
+    <header class="modal-header">
+      <h2>{t('about.title')}</h2>
+      <button id="about-close-btn" class="close-btn">&times;</button>
+    </header>
+    
+    <div class="modal-body">
+      <section class="info-section">
+        <h3>{t('about.subtitle')}</h3>
+        <p>{t('about.desc1')}</p>
+        <p>{t('about.desc2')}</p>
+        
+        <h4>{t('about.q1')}</h4>
+        <p>{t('about.a1')}</p>
+        
+        <h4>{t('about.q2')}</h4>
+        <p>{t('about.a2')}</p>
+        
+        <h4>{t('about.q3')}</h4>
+        <p>{t('about.a3')}</p>
+      </section>
+
+      <hr />
+
+      <section class="info-section">
+        <h3>{t('about.app_title')}</h3>
+        <p>{t('about.app_desc')}</p>
+        <ul>
+          <li set:html={t('about.app_li1')}></li>
+          <li set:html={t('about.app_li2')}></li>
+          <li set:html={t('about.app_li3')}></li>
+          <li set:html={t('about.app_li4')}></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .about-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .about-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .about-modal {
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .about-modal::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+  }
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--bg-secondary);
+    z-index: 1;
+  }
+
+  .modal-header h2 { margin: 0; font-size: 1.4rem; color: var(--accent); }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    line-height: 1;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    line-height: 1.6;
+  }
+
+  .info-section h3 { margin-top: 0; color: var(--text-primary); }
+  .info-section h4 { color: var(--accent); margin-bottom: 0.5rem; }
+  .info-section p {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  ul { padding-left: 1.2rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.5rem; font-size: 0.95rem; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+  /* Soporte para modo oscuro del sistema si falla el script de tema */
+  @media (prefers-color-scheme: dark) {
+    .about-modal {
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+  }
+</style>
+
+<script>
+  const dialog = document.getElementById('about-dialog') as HTMLDialogElement;
+  const openBtn = document.getElementById('about-open-btn');
+  const closeBtn = document.getElementById('about-close-btn');
+
+  openBtn?.addEventListener('click', () => {
+    dialog?.showModal();
+    document.body.style.overflow = 'hidden'; // Evita scroll de fondo
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    dialog?.close();
+    document.body.style.overflow = '';
+  });
+
+  // Cerrar al hacer clic fuera del modal
+  dialog?.addEventListener('click', (e) => {
+    const rect = dialog.getBoundingClientRect();
+    const isInDialog = (
+      rect.top <= e.clientY &&
+      e.clientY <= rect.top + rect.height &&
+      rect.left <= e.clientX &&
+      e.clientX <= rect.left + rect.width
+    );
+    if (!isInDialog) {
+      dialog.close();
+      document.body.style.overflow = '';
+    }
+  });
+</script>
