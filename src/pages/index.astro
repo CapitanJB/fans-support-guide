@@ -10,6 +10,9 @@ import DocumentVault from '../components/DocumentVault.astro';
 import EmergencyContacts from '../components/EmergencyContacts.astro';
 import AboutModal from '../components/AboutModal.astro';
 import ContactModal from '../components/ContactModal.astro';
+
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
 <html lang="es">
@@ -19,7 +22,7 @@ import ContactModal from '../components/ContactModal.astro';
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content="Guía para aficionados al fútbol. Mapas offline, logística y alertas de seguridad para el Mundial 2026." />
+		<meta name="description" content={t('site.description')} />
 		<link rel="manifest" href="/manifest.webmanifest" />
 		
 		<!-- Theme Management Script (Prevent FOUC) -->
@@ -37,7 +40,7 @@ import ContactModal from '../components/ContactModal.astro';
 		</script>
 
 		<script is:inline src="/registerSW.js"></script>
-		<title>Guía para Aficionados - World Cup 2026</title>
+		<title>{t('site.title')}</title>
 		<style is:global>
 			*, *::before, *::after {
 				box-sizing: border-box;
@@ -232,16 +235,16 @@ import ContactModal from '../components/ContactModal.astro';
 					<img src="/logos/logo.svg" alt="Project Logo" class="header-logo" />
 					<!-- <img src="/logos/logo.png" alt="Logo" class="header-logo" /> -->
 				</div>
-				<h1>Guía para Aficionados - WC26</h1>
+				<h1>{t('header.title')}</h1>
 				<div style="display: flex; gap: 0.5rem;">
 					<AboutModal />
 					<ContactModal />
-					<button id="theme-btn" class="theme-toggle" title="Cambiar Tema">🌙</button>
+					<button id="theme-btn" class="theme-toggle" title={t('header.theme_toggle')}>🌙</button>
 				</div>
 			</header>
 
-			<div id="status-badge" class="status">Cargando...</div>
-			<span id="battery-status" class="power-save-badge">🔋 Ahorro Activo</span>
+			<div id="status-badge" class="status">{t('status.loading')}</div>
+			<span id="battery-status" class="power-save-badge">{t('status.battery_save')}</span>
 			
 			<MatchSelector />
 			
@@ -260,16 +263,16 @@ import ContactModal from '../components/ContactModal.astro';
 			<EmergencyContacts />
 		</main>
 
-		<script>
+		<script is:inline define:vars={{ onlineText: t('status.online'), offlineText: t('status.offline') }}>
 			// Status Management
 			const badge = document.getElementById('status-badge');
 			const updateStatus = () => {
 				if (navigator.onLine) {
-					badge.textContent = 'App Online - Sincronizada';
+					badge.textContent = onlineText;
 					badge.style.background = 'var(--status-online)';
 					badge.style.color = 'var(--status-online-text)';
 				} else {
-					badge.textContent = 'Modo Offline - Datos en Memoria';
+					badge.textContent = offlineText;
 					badge.style.background = 'var(--status-offline)';
 					badge.style.color = 'var(--status-offline-text)';
 				}

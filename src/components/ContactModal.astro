@@ -1,28 +1,30 @@
 ---
 // ContactModal.astro
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
 ---
 
-<button id="contact-open-btn" class="contact-btn" title="Contactar con la organización">
+<button id="contact-open-btn" class="contact-btn" title={t('contact.btn_title')}>
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
 </button>
 
 <dialog id="contact-dialog" class="contact-modal">
   <div class="modal-content">
     <header class="modal-header">
-      <h2>¿Tienes dudas?</h2>
+      <h2>{t('contact.title')}</h2>
       <button id="contact-close-btn" class="close-btn">&times;</button>
     </header>
     
     <div class="modal-body">
       <section class="info-section">
-        <h3>✉️ ¡Contáctanos!</h3>
-        <p>Estamos aquí para ayudarte a disfrutar al máximo del evento y organizar tu estancia. Si tienes preguntas sobre logística, seguridad o cualquier otro detalle, no dudes en escribirnos.</p>
+        <h3>{t('contact.subtitle')}</h3>
+        <p>{t('contact.desc1')}</p>
         
-        <p>A través de nuestro Linktree podrás encontrar acceso directo a nuestras redes sociales, canales de comunicación y formularios de consulta rápida.</p>
+        <p>{t('contact.desc2')}</p>
         
         <div class="cta-container">
           <a href="#" target="_blank" class="cta-button">
-             Ir a nuestro Linktree
+             {t('contact.cta')}
           </a>
         </div>
       </section>
@@ -30,8 +32,8 @@
       <hr />
 
       <section class="info-section">
-        <h3>📡 Redes Sociales y Email</h3>
-        <p>Síguenos para estar al tanto de las últimas actualizaciones y alertas en tiempo real:</p>
+        <h3>{t('contact.social_title')}</h3>
+        <p>{t('contact.social_desc')}</p>
         <div class="social-links">
            <a href="https://x.com/YOUR_ACCOUNT" target="_blank" class="social-link">
              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932L18.901 1.153zM17.61 20.644h2.039L6.486 3.24H4.298L17.61 20.644z"/></svg>
