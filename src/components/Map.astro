@@ -91,8 +91,8 @@ const t = useTranslations();
     'Parking': '#01579b',
   };
 
-  const getIcon = (categoria) => {
-    const color = categoryColors[categoria] || '#555';
+  const getIcon = (category) => {
+    const color = categoryColors[category] || '#555';
     return L.divIcon({
       html: `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-12-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>`,
       className: 'custom-marker',
@@ -147,24 +147,24 @@ const t = useTranslations();
 
     // Filter by City if context exists, but KEEP 'Seguridad' category globally
     if (currentCity) {
-      filtered = filtered.filter(p => p.ciudad === currentCity || p.categoria === 'Seguridad');
+      filtered = filtered.filter(p => p.city === currentCity || p.category === 'Seguridad');
     }
 
     // Filter by Category
     if (currentCategory !== 'Todos') {
-      filtered = filtered.filter(p => p.categoria === currentCategory);
+      filtered = filtered.filter(p => p.category === currentCategory);
     }
 
     if (filtered.length > 0) {
       filtered.forEach(poi => {
-        const translatedCat = categoryTranslations[poi.categoria] || poi.categoria;
-        const marker = L.marker([poi.latitud, poi.longitud], { icon: getIcon(poi.categoria) })
+        const translatedCat = categoryTranslations[poi.category] || poi.category;
+        const marker = L.marker([poi.latitude, poi.longitude], { icon: getIcon(poi.category) })
           .bindPopup(`
             <div style="font-family: sans-serif;">
-              <h3 style="margin: 0 0 5px 0;">${poi.nombre}</h3>
+              <h3 style="margin: 0 0 5px 0;">${poi.name}</h3>
               <p style="margin: 0 0 5px 0;"><b>${translatedCat}</b></p>
-              <p style="margin: 0;">${poi.descripcion}</p>
-              <small>${poi.direccion}</small>
+              <p style="margin: 0;">${poi.description}</p>
+              <small>${poi.address}</small>
             </div>
           `);
         markerGroup.addLayer(marker);
@@ -181,18 +181,18 @@ const t = useTranslations();
     const match = e.detail.match;
     if (!match) return;
 
-    currentCity = match.ciudad;
+    currentCity = match.city;
     updateMarkers();
 
     if (match.stadium && map) {
-      map.flyTo([match.stadium.latitud, match.stadium.longitud], 15, {
+      map.flyTo([match.stadium.latitude, match.stadium.longitude], 15, {
         duration: 1.5
       });
       
       setTimeout(() => {
         L.popup()
-          .setLatLng([match.stadium.latitud, match.stadium.longitud])
-          .setContent(`<b>${venueLabel} ${match.stadium.nombre}</b><br>${match.homeTeam} vs ${match.awayTeam}`)
+          .setLatLng([match.stadium.latitude, match.stadium.longitude])
+          .setContent(`<b>${venueLabel} ${match.stadium.name}</b><br>${match.homeTeam} vs ${match.awayTeam}`)
           .openOn(map);
       }, 1600);
     }

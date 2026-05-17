@@ -46,8 +46,8 @@ npm install
 
 | Tab | Columns (in order) |
 | :--- | :--- |
-| **POIs** | `id`, `nombre`, `categoria`, `latitud`, `longitud`, `descripcion`, `direccion`, `icono`, `ciudad` |
-| **Matches** | `id`, `homeTeam`, `awayTeam`, `date`, `time`, `stadiumId`, `ciudad` |
+| **POIs** | `id`, `name`, `category`, `latitude`, `longitude`, `description`, `address`, `icon`, `city` |
+| **Matches** | `id`, `homeTeam`, `awayTeam`, `date`, `time`, `stadiumId`, `city` |
 | **Timeline** | `matchId`, `type`, `time`, `title`, `description`, `poiId` |
 
 3. Publish to the Web as **CSV**.

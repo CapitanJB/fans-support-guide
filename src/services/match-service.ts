@@ -123,15 +123,15 @@ export async function getSurvivalData() {
 
     const pois: PointOfInterest[] = poisRaw.slice(1).map(cols => ({
       id: cols[0],
-      nombre: cols[1],
-      categoria: cols[2],
-      latitud: parseFloat(cols[3]),
-      longitud: parseFloat(cols[4]),
-      descripcion: cols[5],
-      direccion: cols[6],
-      icono: cols[7],
-      ciudad: cols[8]
-    })).filter(p => !isNaN(p.latitud));
+      name: cols[1],
+      category: cols[2],
+      latitude: parseFloat(cols[3]),
+      longitude: parseFloat(cols[4]),
+      description: cols[5],
+      address: cols[6],
+      icon: cols[7],
+      city: cols[8]
+    })).filter(p => !isNaN(p.latitude));
 
     const matches: Match[] = matchesRaw.slice(1).map(cols => ({
       id: cols[0],
@@ -140,7 +140,7 @@ export async function getSurvivalData() {
       date: cols[3],
       time: cols[4],
       stadiumId: cols[5],
-      ciudad: cols[6],
+      city: cols[6],
       stadium: pois.find(p => p.id === cols[5])
     }));
 
@@ -174,5 +174,7 @@ export async function getSurvivalData() {
     }
     return { pois: [], matches: [], timeline: [] };
   }
+}
+
 }
 

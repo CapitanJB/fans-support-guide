@@ -203,7 +203,7 @@ const t = useTranslations();
         container.innerHTML = `
         <div class="weather-card-large">
           <div class="weather-info">
-            <span class="match-venue">📍 ${match.stadium?.nombre || venueLabel}</span>
+            <span class="match-venue">📍 ${match.stadium?.name || venueLabel}</span>
             <hr class="venue-separator" />
             <span class="match-teams"><strong>${match.homeTeam} vs ${match.awayTeam}</strong></span><br />
             <span class="match-date">📅 ${match.date}</span>
@@ -225,7 +225,7 @@ const t = useTranslations();
       container.innerHTML = `
         <div class="weather-card-large">
           <div class="weather-info">
-            <span class="match-venue">📍 ${match.stadium?.nombre || venueLabel}</span>
+            <span class="match-venue">📍 ${match.stadium?.name || venueLabel}</span>
             <hr class="venue-separator" />
             <span class="match-teams"><strong>${match.homeTeam} vs ${match.awayTeam}</strong></span><br />
             <span class="match-date">📅 ${match.date}</span>
@@ -238,7 +238,7 @@ const t = useTranslations();
           <div class="weather-icon-large">${emoji}</div>
         </div>
         <div class="weather-footer">
-          <a href="https://www.google.com/search?q=weather+${encodeURIComponent(match.ciudad||match.stadium?.nombre||'')}+${match.date}" target="_blank" rel="noopener noreferrer" class="weather-detail-link">${viewDetailText}</a>
+          <a href="https://www.google.com/search?q=weather+${encodeURIComponent(match.city||match.stadium?.name||'')}+${match.date}" target="_blank" rel="noopener noreferrer" class="weather-detail-link">${viewDetailText}</a>
         </div>
       `;
     } catch (error) {

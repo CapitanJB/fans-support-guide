@@ -36,8 +36,8 @@ export async function getMatchWeather(match: Match): Promise<WeatherData | null>
   }
 
   try {
-    const lat = match.stadium.latitud;
-    const lon = match.stadium.longitud;
+    const lat = match.stadium.latitude;
+    const lon = match.stadium.longitude;
     
     // Parse date from DD/MM/YYYY to YYYY-MM-DD for API
     const dateParts = match.date.split('/');

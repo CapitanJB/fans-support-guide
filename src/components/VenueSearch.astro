@@ -166,22 +166,22 @@ const t = useTranslations();
       let filtered = allPois;
       
       if (currentCity) {
-        filtered = filtered.filter(p => p.ciudad === currentCity || p.categoria === 'Seguridad');
+        filtered = filtered.filter(p => p.city === currentCity || p.category === 'Seguridad');
       }
 
       filtered = filtered.filter(v => {
-        const translatedCat = categoryTranslations[v.categoria] || v.categoria;
-        return v.nombre.toLowerCase().includes(term) || 
-               v.categoria.toLowerCase().includes(term) ||
+        const translatedCat = categoryTranslations[v.category] || v.category;
+        return v.name.toLowerCase().includes(term) || 
+               v.category.toLowerCase().includes(term) ||
                translatedCat.toLowerCase().includes(term) ||
-               v.direccion.toLowerCase().includes(term);
+               v.address.toLowerCase().includes(term);
       });
 
       renderResults(filtered);
     });
 
     window.addEventListener('match:selected', (e) => {
-      currentCity = e.detail.match.ciudad;
+      currentCity = e.detail.match.city;
       input.value = ''; 
       resultsContainer?.classList.add('hidden');
     });
@@ -204,15 +204,15 @@ const t = useTranslations();
     }
 
     resultsContainer.innerHTML = filtered.map(v => {
-      const translatedCat = categoryTranslations[v.categoria] || v.categoria;
+      const translatedCat = categoryTranslations[v.category] || v.category;
       return `
-        <div class="result-item" data-lat="${v.latitud}" data-lon="${v.longitud}">
-          <div class="result-icon">${getEmojiForCategory(v.categoria)}</div>
+        <div class="result-item" data-lat="${v.latitude}" data-lon="${v.longitude}">
+          <div class="result-icon">${getEmojiForCategory(v.category)}</div>
           <div class="result-text">
-            <span class="venue-name">${v.nombre}</span>
+            <span class="venue-name">${v.name}</span>
             <div class="venue-meta">
               <span class="venue-cat">${translatedCat}</span> • 
-              <span class="venue-city">${v.direccion}</span>
+              <span class="venue-city">${v.address}</span>
             </div>
           </div>
         </div>

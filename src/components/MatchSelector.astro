@@ -94,7 +94,7 @@ const t = useTranslations();
         const dateParts = m.date.split('/');
         const dateFormatted = dateParts.length === 3 ? `${dateParts[0]}/${dateParts[1]}` : m.date;
         
-        return `<option value="${m.id}">${dateFormatted} - ${m.homeTeam} vs ${m.awayTeam} - ${m.ciudad || m.stadium?.ciudad || venueFallback}</option>`;
+        return `<option value="${m.id}">${dateFormatted} - ${m.homeTeam} vs ${m.awayTeam} - ${m.city || m.stadium?.city || venueFallback}</option>`;
       }).join('');
 
       // Determine initial selection
