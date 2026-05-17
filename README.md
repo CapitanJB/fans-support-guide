@@ -52,6 +52,13 @@ npm install
 3. Add the values to your `.env` file.
 4. Enable Cloud Messaging and generate a Web Push (VAPID) key.
 
+#### 🌍 Internationalization (i18n)
+To translate the app to your language:
+1. Open `src/i18n/ui.ts`.
+2. Add your language code to the `languages` object.
+3. Add your translations to the `ui` object (you can copy and modify the `en` block).
+4. Change `defaultLang` to your language code (e.g., `defaultLang = 'en'`).
+
 ### 🖼️ Required Assets
 To ensure the PWA and branding work correctly, you must provide the following files in the `public/` directory:
 
