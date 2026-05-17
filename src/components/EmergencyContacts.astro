@@ -1,30 +1,33 @@
 ---
 // EmergencyContacts.astro
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
+
 const contacts = [
   {
     country: "México",
     icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 20" width="24" height="15"><rect width="10.6" height="20" fill="#006847"/><rect x="10.6" width="10.8" height="20" fill="#fff"/><rect x="21.4" width="10.6" height="20" fill="#CE1126"/><circle cx="16" cy="10" r="1.5" fill="#8B4513"/></svg>`,
     numbers: [
-      { label: "Emergencias", value: "911" },
-      { label: "Emergencia Consular Guadalajara", value: "+52 33 3116 4272" },
-      { label: "Cruz Roja", value: "065" }
+      { label: t('emergency.label.general'), value: "911" },
+      { label: t('emergency.label.consular_guadalajara'), value: "+52 33 3116 4272" },
+      { label: t('emergency.label.red_cross'), value: "065" }
     ]
   },
   {
     country: "USA",
     icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 20" width="24" height="15"><rect width="32" height="20" fill="#B22234"/><path d="M0 1.54h32v1.54H0zm0 3.08h32v1.54H0zm0 3.08h32v1.54H0zm0 3.08h32v1.54H0zm0 3.08h32v1.54H0zm0 3.08h32v1.54H0z" fill="#fff"/><rect width="12.8" height="10.77" fill="#3C3B6E"/></svg>`,
     numbers: [
-      { label: "Emergencias", value: "911" },
-      { label: "Emergencia Consular Miami", value: "+1 305 790 1851" },
-      { label: "Emergencia Consular Los Angeles", value: "+1 323 445 0484" },
-      { label: "Emergencia Consular Houston", value: "+1 713 962 6284" }
+      { label: t('emergency.label.general'), value: "911" },
+      { label: t('emergency.label.consular_miami'), value: "+1 305 790 1851" },
+      { label: t('emergency.label.consular_la'), value: "+1 323 445 0484" },
+      { label: t('emergency.label.consular_houston'), value: "+1 713 962 6284" }
     ]
   }
 ];
 ---
 
 <div class="emergency-container">
-  <h3>🆘 Contactos de Emergencia</h3>
+  <h3>{t('emergency.title')}</h3>
   <div class="emergency-grid">
     {contacts.map(c => (
       <div class="country-card">

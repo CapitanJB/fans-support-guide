@@ -2,48 +2,51 @@
 /**
  * StadiumRules.astro - Pocket guide for stadium security
  */
+import { useTranslations } from '../i18n/utils';
+const t = useTranslations();
+
 const prohibited = [
-  { item: "Botellas de vidrio y latas", icon: "🚫" },
-  { item: "Bolsos grandes (> 30x15x30 cm)", icon: "🚫" },
-  { item: "Cámaras profesionales", icon: "📷" },
-  { item: "Paraguas rígidos", icon: "☂️" },
-  { item: "Punteros láser", icon: "✨" },
-  { item: "Baterías externas grandes", icon: "🔋" }
+  { item: t('rules.item.glass'), icon: "🚫" },
+  { item: t('rules.item.bags_large'), icon: "🚫" },
+  { item: t('rules.item.cameras'), icon: "📷" },
+  { item: t('rules.item.umbrellas'), icon: "☂️" },
+  { item: t('rules.item.lasers'), icon: "✨" },
+  { item: t('rules.item.batteries_large'), icon: "🔋" }
 ];
 
 const permitted = [
-  { item: "Botellas de plástico (sin tapón)", icon: "✅" },
-  { item: "Pequeño bolso personal (11x16.5 cm)", icon: "👛" },
-  { item: "Batería externa pequeña", icon: "📱" },
-  { item: "Capa de lluvia", icon: "🧥" }
+  { item: t('rules.item.plastic_bottles'), icon: "✅" },
+  { item: t('rules.item.bags_small'), icon: "👛" },
+  { item: t('rules.item.batteries_small'), icon: "📱" },
+  { item: t('rules.item.rain_cape'), icon: "🧥" }
 ];
 
 const flagRules = [
-  { item: "Tamaño máximo 2m x 1.5m", icon: "🏳️" },
-  { item: "Materiales no inflamables", icon: "🔥" },
-  { item: "Mástiles: plástico flexible (máx. 1m x 1cm)", icon: "📏" },
-  { item: "Contenido positivo y respetuoso", icon: "🤝" },
-  { item: "Sin fines comerciales o promocionales", icon: "🚫" },
-  { item: "Libre de mensajes ofensivos o discriminatorios", icon: "🛑" }
+  { item: t('rules.flag.size'), icon: "🏳️" },
+  { item: t('rules.flag.fire'), icon: "🔥" },
+  { item: t('rules.flag.poles'), icon: "📏" },
+  { item: t('rules.flag.positive'), icon: "🤝" },
+  { item: t('rules.flag.commercial'), icon: "🚫" },
+  { item: t('rules.flag.offensive'), icon: "🛑" }
 ];
 
 const bagRules = [
-  { item: "Bolsas de plástico transparente (máx. 30x15x30 cm)", icon: "🛍️" },
-  { item: "Bolsos de mano pequeños (máx. 11x16.5 cm)", icon: "👛" },
-  { item: "Se permite una bolsa por persona", icon: "👤" }
+  { item: t('rules.bag.transparent'), icon: "🛍️" },
+  { item: t('rules.bag.small'), icon: "👛" },
+  { item: t('rules.bag.limit'), icon: "👤" }
 ];
 ---
 
 <section class="rules-container">
   <button id="rules-toggle" class="rules-header">
-    <h3>📖 Guía de Bolsillo: Reglas del Estadio</h3>
+    <h3>{t('rules.title')}</h3>
     <span id="toggle-icon">▼</span>
   </button>
   
   <div id="rules-content" class="rules-content hidden">
     <div class="rules-grid">
       <div class="rules-column prohibited">
-        <h4>Prohibido</h4>
+        <h4>{t('rules.prohibited')}</h4>
         <ul>
           {prohibited.map(p => (
             <li><span class="icon">{p.icon}</span> {p.item}</li>
@@ -51,7 +54,7 @@ const bagRules = [
         </ul>
       </div>
       <div class="rules-column permitted">
-        <h4>Permitido</h4>
+        <h4>{t('rules.permitted')}</h4>
         <ul>
           {permitted.map(p => (
             <li><span class="icon">{p.icon}</span> {p.item}</li>
@@ -62,7 +65,7 @@ const bagRules = [
 
     <div class="rules-details">
       <div class="detail-section">
-        <h5>🏳️ Normativa de Banderas</h5>
+        <h5>{t('rules.flags')}</h5>
         <ul>
           {flagRules.map(r => (
             <li><span class="icon">{r.icon}</span> {r.item}</li>
@@ -70,7 +73,7 @@ const bagRules = [
         </ul>
       </div>
       <div class="detail-section">
-        <h5>👜 Normativa de Bolsas</h5>
+        <h5>{t('rules.bags')}</h5>
         <ul>
           {bagRules.map(r => (
             <li><span class="icon">{r.icon}</span> {r.item}</li>
@@ -79,7 +82,7 @@ const bagRules = [
       </div>
     </div>
 
-    <p class="disclaimer">* Todas las banderas y bolsas serán inspeccionadas en los accesos. Sujeto a cambios según la FIFA y la sede local.</p>
+    <p class="disclaimer">{t('rules.disclaimer')}</p>
   </div>
 </section>
 
